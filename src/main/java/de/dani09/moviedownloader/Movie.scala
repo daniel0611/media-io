@@ -27,6 +27,4 @@ class Movie(val downloadUrl: URL,
 
     if (withEmptyLineAtEnd) println()
   }
-
-
 }

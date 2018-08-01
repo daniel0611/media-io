@@ -5,7 +5,7 @@ import java.net.{MalformedURLException, URL}
 import de.mediathekview.mlib.daten.DatenFilm
 
 //noinspection SpellCheckingInspection
-object DatenFilm2MovieConverter {
+object DatenFilmToMovieConverter {
   def convert(data: DatenFilm): Movie = {
     val arr = proccessArray(data.arr)
     if (arr.size < 8) {
