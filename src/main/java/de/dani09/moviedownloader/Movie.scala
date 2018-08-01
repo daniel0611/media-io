@@ -1,4 +1,4 @@
-package de.dani09.mlibtest
+package de.dani09.moviedownloader
 
 import java.net.URL
 
