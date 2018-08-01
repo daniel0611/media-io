@@ -15,7 +15,7 @@ object DatenFilm2MovieConverter {
     try {
       new Movie(
         downloadUrl = new URL(data.getUrl),
-        station = arr.head,
+        tvChannel = arr.head,
         seriesTitle = arr(1),
         episodeTitle = arr(2),
         releaseDate = arr(3),

@@ -4,7 +4,7 @@ import java.net.URL
 
 
 class Movie(val downloadUrl: URL,
-            val station: String,
+            val tvChannel: String,
             val seriesTitle: String,
             val episodeTitle: String,
             val releaseDate: String,
@@ -16,7 +16,7 @@ class Movie(val downloadUrl: URL,
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
     println(s"DownloadUrl\t\t$downloadUrl")
-    println(s"Station\t\t\t$station")
+    println(s"Station\t\t\t$tvChannel")
     println(s"SeriesTitle\t\t$seriesTitle")
     println(s"EpisodeTitle\t$episodeTitle")
     println(s"ReleaseDate\t\t$releaseDate")
