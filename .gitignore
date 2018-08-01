@@ -1,0 +1,5 @@
+.idea
+build
+.gradle
+MovieDownloader.iml
+gradlew*

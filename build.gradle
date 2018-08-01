@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'scala'
+
+group 'de.dani09'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+sourceSets.main.scala.srcDir "src/main/java"
+sourceSets.main.java.srcDirs = []
+sourceSets.test.scala.srcDir "src/test/java"
+sourceSets.test.java.srcDirs = []
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'de.mediathekview:MLib:3.0.2'
+    compile 'org.scala-lang:scala-library:2.11.8'
+}
