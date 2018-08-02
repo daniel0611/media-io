@@ -20,7 +20,7 @@ class Config(
 
     // Check maxDaysOld
     val movieMillis = movie.releaseDate.getTime
-    val maxDaysOldDelta = maxDaysOld.toLong * 24 * 60 * 60 * 1000
+    val maxDaysOldDelta = if (maxDaysOld == 0) Long.MaxValue else maxDaysOld.toLong * 24 * 60 * 60 * 1000
     val minimumAllowedMillis = new Date().getTime - maxDaysOldDelta
 
     if (movieMillis < minimumAllowedMillis) return false

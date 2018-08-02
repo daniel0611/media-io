@@ -20,4 +20,5 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'de.mediathekview:MLib:3.0.2'
     compile 'org.scala-lang:scala-library:2.12.6'
+    compile 'org.json:json:20180130'
 }
