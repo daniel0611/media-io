@@ -1,7 +1,7 @@
 package de.dani09.moviedownloader
 
 import java.net.{MalformedURLException, URL}
-import java.text.SimpleDateFormat
+import java.text.{ParseException, SimpleDateFormat}
 
 import de.mediathekview.mlib.daten.DatenFilm
 
@@ -13,12 +13,12 @@ object DatenFilmToMovieConverter {
       return null
     }
 
-    val releaseDateString = arr(3)
-    val releaseTimeString = arr(4)
-    val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
-    val releaseDate = releaseDateParser.parse(s"$releaseTimeString $releaseDateString")
-
     try {
+      val releaseDateString = arr(3)
+      val releaseTimeString = arr(4)
+      val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
+      val releaseDate = releaseDateParser.parse(s"$releaseTimeString $releaseDateString")
+
       new Movie(
         downloadUrl = new URL(data.getUrl),
         tvChannel = arr.head,
@@ -30,6 +30,7 @@ object DatenFilmToMovieConverter {
         sizeInMb = data.dateigroesseL.l.toInt
       )
     } catch {
+      case _: ParseException => null
       case _: MalformedURLException => null
     }
   }
