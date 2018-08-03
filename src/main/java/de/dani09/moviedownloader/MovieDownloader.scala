@@ -5,7 +5,12 @@ import java.net.URL
 import java.nio.file.Path
 
 import de.dani09.moviedownloader.config.Config
+import de.mediathekview.mlib.daten.ListeFilme
+import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
+import de.mediathekview.mlib.filmlisten.FilmlisteLesen
 import me.tongfei.progressbar.{ProgressBarBuilder, ProgressBarStyle}
+
+import scala.collection.JavaConverters._
 
 class MovieDownloader(config: Config) {
 
@@ -53,4 +58,37 @@ class MovieDownloader(config: Config) {
     }
   }
 
+  //noinspection SpellCheckingInspection
+  def getMovieList(movieDataPath: Path): List[Movie] = {
+    val l = new FilmlisteLesen()
+    println(movieDataPath.toString)
+    var done = false
+    l.addAdListener(new ListenerFilmeLaden() {
+      override def fertig(e: ListenerFilmeLadenEvent): Unit = {
+        super.fertig(e)
+        if (e.fehler)
+          println(e.text)
+        done = true
+      }
+    })
+
+    val filme = new ListeFilme()
+    l.readFilmListe(movieDataPath.toString, filme, 1)
+
+    // Waiting until done
+    while (!done) {
+      Thread.sleep(100)
+    }
+
+    // Convert from "DatenFilm" to Movie
+    filme.asScala
+      .map(m => DatenFilmToMovieConverter.convert(m))
+      .filter(_ != null)
+      .toList
+  }
+
+  /*
+  def downloadMovie(): Unit = {
+
+  }*/
 }
