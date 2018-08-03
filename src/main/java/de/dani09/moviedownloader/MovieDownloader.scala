@@ -13,7 +13,6 @@ class MovieDownloader(config: Config) {
     var file: FileOutputStream = null
     var reader: BufferedReader = null
 
-
     try {
       file = new FileOutputStream(new File(destination.toUri))
 
@@ -36,7 +35,7 @@ class MovieDownloader(config: Config) {
       while (count != -1) {
         count = input.read(data, 0, 1024)
         if (count != -1) {
-          file.write(data)
+          file.write(data, 0, count)
           pb.stepBy(count)
         } else {
           pb.close()
