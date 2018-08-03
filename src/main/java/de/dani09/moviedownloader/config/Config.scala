@@ -15,8 +15,10 @@ class Config(
 
   def matchesMovie(movie: Movie): Boolean = {
     // Check minimumSize and minimum Length
-    if (movie.sizeInMb < minimumSize) return false
-    if (movie.lengthInMinutes < minimumLength) return false
+    if (minimumSize != 0 && movie.sizeInMb != 0
+      && movie.sizeInMb < minimumSize) return false
+    if (minimumLength != 0 && movie.lengthInMinutes != 0
+      && movie.lengthInMinutes < minimumLength) return false
 
     // Check maxDaysOld
     val movieMillis = movie.releaseDate.getTime
