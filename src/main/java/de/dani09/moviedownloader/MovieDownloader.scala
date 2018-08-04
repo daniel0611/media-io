@@ -73,7 +73,7 @@ class MovieDownloader(config: Config) {
     })
 
     val filme = new ListeFilme()
-    l.readFilmListe(movieDataPath.toString, filme, 1)
+    l.readFilmListe(movieDataPath.toString, filme, config.maxDaysOld)
 
     // Waiting until done
     while (!done) {
