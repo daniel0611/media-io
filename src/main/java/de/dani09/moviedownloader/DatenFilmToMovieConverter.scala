@@ -26,7 +26,7 @@ object DatenFilmToMovieConverter {
         episodeTitle = arr(2),
         releaseDate = releaseDate,
         description = arr(7),
-        lengthInMinutes = data.dauerL,
+        lengthInMinutes = data.dauerL / 60,
         sizeInMb = data.dateigroesseL.l.toInt
       )
     } catch {
