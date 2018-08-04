@@ -24,7 +24,7 @@ class MovieDownloader(config: Config) {
 
   //noinspection SpellCheckingInspection
   def getMovieList(movieDataPath: Path): List[Movie] = {
-    val l = new FilmlisteLesen()
+    val l = new FilmlisteLesen() // Maybe Parse without Library
     println(movieDataPath.toString)
     var done = false
     l.addAdListener(new ListenerFilmeLaden() {
