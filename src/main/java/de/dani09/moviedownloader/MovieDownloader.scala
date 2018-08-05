@@ -57,7 +57,6 @@ class MovieDownloader(config: Config) {
     val destinationPath = getMovieSavePath(movie)
     val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
 
-    println(s"Downloading $name")
     downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true)
   }
 
