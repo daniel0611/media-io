@@ -1,0 +1,12 @@
+{
+  "downloadDirectory": "./download/",
+  "minimumSize": 0,
+  "minimumLength": 0,
+  "maxDaysOld": 0,
+  "filters": [
+    {
+      "tvChannel": "zdf",
+      "seriesTitle": "Der Bergdoktor"
+    }
+  ]
+}
