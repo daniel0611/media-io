@@ -4,4 +4,4 @@ jdk:
 - oraclejdk9
 - openjdk8
 
-script: gradle build
+script: ./gradlew build

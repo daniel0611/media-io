@@ -2,6 +2,5 @@
 build
 .gradle
 MovieDownloader.iml
-gradlew*
 config.json
 download
