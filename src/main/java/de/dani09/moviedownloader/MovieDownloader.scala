@@ -78,8 +78,9 @@ class MovieDownloader(config: Config) {
       }
       out = new FileOutputStream(file)
 
+      println(s"Downloading $taskName")
+
       val pb = new ProgressBarBuilder()
-        .setTaskName(s"Downloading $taskName")
         .setStyle(ProgressBarStyle.ASCII)
         .setUnit("MB", 1048576)
         .setInitialMax(fullSize)
