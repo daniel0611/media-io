@@ -13,7 +13,7 @@ deploy:
     secure: gQhidLU7K0+BZ7cWnvpyP415gL30Etca6k8d9q4NYRfnSVqddEzjtjyBtSEtXElGWM6jzWxjuKwyWBYZoaDdFhZD/WdpHTPcI1VPvR5XJiODwsap3O7p+PkCXXZPp8tOdL2wdfst7RnRmf29VZ0hSfAtmNipbsQnP2Rmrid0oNpymwDHtc77o4pTXkrSj90jHO99EWCCPnj5A99DzmzP0SIDK4Z7ncXC8lnS5eh+wzKY4kt0Kv+MAmWm28qRD8i0S7iUsd4mJUfptOY9X+dJLqN+GSbW6sldCjwtj/dAhRpH0eJcdtti7cQb3zGE3X6DoiCGb1At+kBE8UnjSWGenqK1le429UrOUGymZG5OjtMlpNxqKiOYHnEo4W/30vU1cYg1ByXGGdyFKgNpe+NcbE94ZatNGMKxswuTf6lF06XUWlCS4MPks9MizA9BrqTQZAUS0fjHlLiex1umYWYoIadGVye5lVYOcgzGYtNi/fERQopHcHV2L858P+V16GBJ0S7RgAGttS8tZ3yttwKDnFE0H7VAE8S2IdI8F7VLv3IjRYJvCB6v9z89Dn8kFIUtiPdpWXO1lrdKXvS/c9sp7OeWRoG+VFUav1TneVv/h/TCVPsT/XBiquKXQ/r+nB14DekZHPse3b+PavbU9+eQlEv8tNBHdp8hUQ10R8Rng+c=
   skip_cleanup: true
   file_glob: true
-  file: build/lib/*
+  file: build/libs/*
   on:
     repo: dani909/movie-downloader
     tags: true
