@@ -18,6 +18,7 @@ object CLIConfig {
         .valueName("<Path>")
         .text("Path to config file Default: ./config.json")
         .action((v, c) => c.copy(v.toPath))
+        .validate(f => if (f.exists()) success else failure("Specified Config file does not exist"))
         .required()
         .withFallback(() => new File("./config.json"))
 
