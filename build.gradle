@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 apply plugin: 'java'
 apply plugin: 'scala'
 
@@ -22,6 +25,7 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.12.6'
     compile 'org.json:json:20180130'
     compile 'me.tongfei:progressbar:0.7.1'
+    compile 'com.github.scopt:scopt_2.12:3.7.0'
 }
 
 jar {
@@ -34,4 +38,18 @@ jar {
     from {
         configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+task createProperties {
+    doLast {
+        def version = project.version.toString()
+        def path = Paths.get("$buildDir/resources/main/version.txt")
+        Files.createDirectories(path.getParent())
+        def file = new File(path as String)
+        file.write(version)
+    }
+}
+
+jar {
+    dependsOn createProperties
 }

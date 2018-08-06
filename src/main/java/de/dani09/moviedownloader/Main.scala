@@ -3,33 +3,33 @@ package de.dani09.moviedownloader
 import java.net.URL
 import java.nio.file.{Path, Paths}
 
-import de.dani09.moviedownloader.config.Config
+import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.json.JSONException
 
-// TODO Windows support
+// TODO Windows support??
 // TODO Tool to search by regex
-// TODO CLI to change config file
+// TODO entry in config file to override movieDataSource
 
 object Main {
-  val configPath = "./config.json"
   val movieListFileName = "movie-data.xz"
   val movieDataSource = new URL("http://verteiler1.mediathekview.de/Filmliste-akt.xz")
 
   def main(args: Array[String]): Unit = {
+    val cliConf = CLIConfig.parse(args)
     var config: Config = null
 
     try {
-      config = Config.parseConfig(configPath)
+      config = Config.parseConfig(cliConf.configPath)
     } catch {
       case e: JSONException =>
-        println(s"Couldn't parse $configPath: $e")
+        println(s"Couldn't parse Config at ${"\"" + cliConf.configPath + "\""}: $e")
         System.exit(1)
       case e: Throwable =>
-        println(s"Couldn't load $configPath: $e")
+        println(s"Couldn't load Config at ${"\"" + cliConf.configPath + "\""}: $e")
         System.exit(1)
     }
 
-    println("Parsed Config successfully")
+    println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
 
     println("Launching Movie Downloader")
     downloadMovies(config)

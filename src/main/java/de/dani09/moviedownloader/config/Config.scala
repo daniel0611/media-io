@@ -36,8 +36,8 @@ class Config(
 }
 
 object Config {
-  def parseConfig(path: String): Config = {
-    val configString = Files.readAllLines(Paths.get(path)).asScala.mkString("")
+  def parseConfig(path: Path): Config = {
+    val configString = Files.readAllLines(path).asScala.mkString("")
     val configJson = new JSONObject(configString)
 
     // Get Filters
