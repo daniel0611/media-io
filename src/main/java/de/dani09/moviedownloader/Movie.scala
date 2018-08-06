@@ -18,7 +18,7 @@ class Movie(val downloadUrl: URL,
     println(s"DownloadUrl\t\t$downloadUrl")
     println(s"Station\t\t\t$tvChannel")
     println(s"SeriesTitle\t\t$seriesTitle")
-    println(s"EpisodeTitle\t\t$episodeTitle")
+    println(s"EpisodeTitle\t\t$episodeTitle") // TODO Broken sometimes 2 tabs sometimes only one needed
     println(s"ReleaseDate\t\t$releaseDate")
     println(s"Description\t\t$description")
     println(s"Length\t\t\t$lengthInMinutes")

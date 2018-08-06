@@ -1,7 +1,7 @@
 {
   "downloadDirectory": "./download/",
-  "minimumSize": 0,
-  "minimumLength": 0,
+  "minimumSize": 50,
+  "minimumLength": 20,
   "maxDaysOld": 0,
   "filters": [
     {
