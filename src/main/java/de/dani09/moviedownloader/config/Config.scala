@@ -1,9 +1,12 @@
 package de.dani09.moviedownloader.config
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
 import de.dani09.moviedownloader.Movie
+import org.json.JSONObject
+
+import scala.collection.JavaConverters._
 
 class Config(
               val downloadDirectory: Path,
@@ -29,5 +32,27 @@ class Config(
 
     // Check Filters
     movieFilters.count(_.matchesMovie(movie)) > 0
+  }
+}
+
+object Config {
+  def parseConfig(path: String): Config = {
+    val configString = Files.readAllLines(Paths.get(path)).asScala.mkString("")
+    val configJson = new JSONObject(configString)
+
+    // Get Filters
+    val filterArray = configJson.getJSONArray("filters")
+    val filters = (for (i <- 0 until filterArray.length()) yield i)
+      .map(index => filterArray.getJSONObject(index))
+      .map(f => new MovieFilter(f.getString("tvChannel"), f.getString("seriesTitle").r))
+      .toList
+
+    new Config(
+      downloadDirectory = Paths.get(configJson.getString("downloadDirectory")),
+      minimumSize = configJson.getInt("minimumSize"),
+      minimumLength = configJson.getLong("minimumLength"),
+      maxDaysOld = configJson.getInt("maxDaysOld"),
+      filters
+    )
   }
 }

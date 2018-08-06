@@ -3,7 +3,7 @@ package de.dani09.moviedownloader
 import java.net.URL
 import java.nio.file.{Path, Paths}
 
-import de.dani09.moviedownloader.config.{Config, ConfigParser}
+import de.dani09.moviedownloader.config.Config
 import org.json.JSONException
 
 // TODO Windows support
@@ -19,7 +19,7 @@ object Main {
     var config: Config = null
 
     try {
-      config = ConfigParser.parseConfig(configPath)
+      config = Config.parseConfig(configPath)
     } catch {
       case e: JSONException =>
         println(s"Couldn't parse $configPath: $e")
