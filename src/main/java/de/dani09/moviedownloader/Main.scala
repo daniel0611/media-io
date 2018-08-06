@@ -31,18 +31,24 @@ object Main {
 
     println("Parsed Config successfully")
 
+    println("Launching Movie Downloader")
+    downloadMovies(config)
+  }
+
+  def downloadMovies(config: Config): Unit = {
     println("Getting Movie List")
     val downloader = new MovieDownloader(config)
     downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
-    println("Downloaded Movie List")
 
-    val allMovies = downloader.getMovieList(getMovieListTmpPath)
-
+    var movies = downloader.getMovieList(getMovieListTmpPath)
     println("Parsed Movie List successfully")
+    println(s"${movies.length} Movies found in total")
 
-    val movies = allMovies
-      .filter(x => config.matchesMovie(x))
-      .filter(x => !downloader.isMovieAlreadyDownloaded(x))
+    movies = movies.filter(x => config.matchesMovie(x))
+    println(s"${movies.length} Movies matched Filters")
+
+    movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))
+    println(s"${movies.length} not already downloaded")
 
     if (movies.nonEmpty) {
       println(s"Will download ${movies.length} Movies:")
