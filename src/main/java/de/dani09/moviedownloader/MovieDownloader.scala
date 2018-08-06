@@ -84,7 +84,7 @@ class MovieDownloader(config: Config) {
         .setStyle(ProgressBarStyle.ASCII)
         .setUnit("MB", 1048576)
         .setInitialMax(fullSize)
-        .setUpdateIntervalMillis(100)
+        .setUpdateIntervalMillis(500)
         .build()
 
       reader = new BufferedReader(new InputStreamReader(input))
