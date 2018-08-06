@@ -17,7 +17,7 @@ object CLIConfig {
       opt[File]('c', "config")
         .valueName("<Path>")
         .text("Path to config file Default: ./config.json")
-        .action((value, i) => i.copy(value.toPath))
+        .action((v, c) => c.copy(v.toPath))
         .required()
         .withFallback(() => new File("./config.json"))
 
@@ -28,7 +28,7 @@ object CLIConfig {
     parser.parse(args, new CLIConfig()) match {
       case Some(value) => value
       case None =>
-        System.exit(0)
+        System.exit(1)
         null
     }
   }
