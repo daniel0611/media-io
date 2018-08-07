@@ -36,7 +36,7 @@ object Main {
   }
 
   def downloadMovies(config: Config): Unit = {
-    println("Getting Movie List")
+    println("Getting Movie Data")
     val downloader = new MovieDownloader(config)
     downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
 
