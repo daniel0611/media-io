@@ -2,12 +2,12 @@ package de.dani09.moviedownloader
 
 import java.net.URL
 import java.nio.file.{Path, Paths}
+import java.util.Scanner
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config}
+import de.dani09.moviedownloader.config.{CLIConfig, Config, MovieFilter}
 import org.json.JSONException
 
 // TODO Windows support??
-// TODO Tool to search by regex
 // TODO entry in config file to override movieDataSource
 
 object Main {
@@ -16,6 +16,10 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val cliConf = CLIConfig.parse(args)
+    if (cliConf.interactive) {
+      interactiveRegexSearch()
+      System.exit(0)
+    }
     var config: Config = null
 
     try {
@@ -65,18 +69,45 @@ object Main {
     println("Done!")
   }
 
-  private def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): List[Movie] = {
-    val movies = downloader.getMovieList(path)
-    println("Parsed Movie List successfully")
-    println(s"${movies.length} Movies found in total")
+  def interactiveRegexSearch(): Unit = {
+    println("Entering interactive mode!")
 
-    movies
+    saveMovieData()
+    val movies = getMovies(new MovieDownloader(new Config(null, 0, 0, 0, null)))
+    val s = new Scanner(System.in)
+
+    while (true) {
+      println("Creating MovieFilter")
+      println("Enter an TvChannel:")
+      val channel = s.nextLine()
+
+      println("Enter an SeriesTitle Regex:")
+      val seriesTitle = s.nextLine().r
+
+      println("Creating MovieFilter")
+
+      val filter = new MovieFilter(channel, seriesTitle)
+      val matchedMovies = movies.filter(m => filter.matchesMovie(m))
+
+      println(s"${matchedMovies.length} Movies matched entered Filter!")
+
+      if (matchedMovies.nonEmpty) {
+        println("Do you want to see them? (Y/n)")
+        val answer = s.nextLine()
+
+        if (answer.toLowerCase != "n")
+          matchedMovies.foreach(_.printInfo())
+      } else {
+        println("Please try again")
+      }
+
+      println()
+    }
   }
 
   def saveMovieData(path: Path = getMovieListTmpPath,
                     downloader: MovieDownloader = new MovieDownloader(null),
                     source: URL = movieDataSource): Unit = {
-    println("Getting Movie Data")
     downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
   }
 
@@ -86,7 +117,12 @@ object Main {
     Paths.get(tmp, movieListFileName)
   }
 
-  def interactiveRegexSearch(): Unit = {
+  private def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): List[Movie] = {
+    println("Reading Movie Data")
+    val movies = downloader.getMovieList(path)
+    println("Parsed Movie Data successfully")
+    println(s"${movies.length} Movies found in total")
 
+    movies
   }
 }
