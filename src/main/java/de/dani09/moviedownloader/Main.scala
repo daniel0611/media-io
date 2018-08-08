@@ -36,13 +36,10 @@ object Main {
   }
 
   def downloadMovies(config: Config): Unit = {
-    println("Getting Movie Data")
     val downloader = new MovieDownloader(config)
-    downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
+    saveMovieData(downloader = downloader)
 
-    var movies = downloader.getMovieList(getMovieListTmpPath)
-    println("Parsed Movie List successfully")
-    println(s"${movies.length} Movies found in total")
+    var movies: List[Movie] = getMovies(downloader)
 
     movies = movies.filter(x => config.matchesMovie(x))
     println(s"${movies.length} Movies matched Filters")
@@ -68,9 +65,28 @@ object Main {
     println("Done!")
   }
 
+  private def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): List[Movie] = {
+    val movies = downloader.getMovieList(path)
+    println("Parsed Movie List successfully")
+    println(s"${movies.length} Movies found in total")
+
+    movies
+  }
+
+  def saveMovieData(path: Path = getMovieListTmpPath,
+                    downloader: MovieDownloader = new MovieDownloader(null),
+                    source: URL = movieDataSource): Unit = {
+    println("Getting Movie Data")
+    downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
+  }
+
   def getMovieListTmpPath: Path = {
     val tmp = System.getProperty("java.io.tmpdir")
 
     Paths.get(tmp, movieListFileName)
+  }
+
+  def interactiveRegexSearch(): Unit = {
+
   }
 }
