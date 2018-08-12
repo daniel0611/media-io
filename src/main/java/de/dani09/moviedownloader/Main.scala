@@ -9,6 +9,8 @@ import org.json.JSONException
 
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
+// TODO download single Movies in interactive mode
+// TODO regex filter for episodeTitle
 
 object Main {
   val movieListFileName = "movie-data.xz"
