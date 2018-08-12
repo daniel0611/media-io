@@ -11,6 +11,7 @@ import org.json.JSONException
 // TODO entry in config file to override movieDataSource
 // TODO regex filter for episodeTitle
 // TODO fix episodeTitles that will create another folder in the series folder like "Some text / Some different Text" --> Some different Text in folder Some Text
+// TODO interactive mode without config file
 
 object Main {
   val movieListFileName = "movie-data.xz"
