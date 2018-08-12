@@ -43,8 +43,8 @@ object CLIConfig {
   private def getVersion: String = {
     val in = getClass.getClassLoader.getResourceAsStream("version.txt")
     if (in != null)
-      Source.fromInputStream(in).mkString
+      s"Version ${Source.fromInputStream(in).mkString}"
     else
-      "Dev-Version"
+      "Version Dev"
   }
 }
