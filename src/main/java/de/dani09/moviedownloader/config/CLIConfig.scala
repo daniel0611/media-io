@@ -25,7 +25,7 @@ object CLIConfig {
         .withFallback(() => new File("./config.json"))
 
       opt[Unit]('i', "interactive")
-        .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters")
+        .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies")
         .action((v, c) => c.copy(interactive = true))
 
       version("version").text("Displays the used Version")
