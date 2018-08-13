@@ -124,6 +124,7 @@ class MovieDownloader(config: Config) {
   }
 
   private def getMovieSavePath(movie: Movie) = {
+    // TODO cleanup
     val date = movie.releaseDate
     val calendar = Calendar.getInstance()
     calendar.setTime(date)
@@ -131,7 +132,7 @@ class MovieDownloader(config: Config) {
     val dateString = s"${calendar.get(Calendar.DAY_OF_MONTH)}.${calendar.get(Calendar.MONTH)}.${calendar.get(Calendar.YEAR)}"
     val fileExtension = getFileExtension(movie.downloadUrl)
 
-    val pathString = s"${config.downloadDirectory}/${movie.tvChannel}/${movie.seriesTitle}/${movie.episodeTitle}-$dateString.$fileExtension"
+    val pathString = s"${config.downloadDirectory}/${movie.tvChannel}/${movie.seriesTitle.replaceAll("/", "|")}/${movie.episodeTitle.replaceAll("/", "|")}-$dateString.$fileExtension"
     Paths.get(pathString)
   }
 
