@@ -1,5 +1,6 @@
 package de.dani09.moviedownloader.config
 
+import java.io.File
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
@@ -37,6 +38,10 @@ class Config(
 
 object Config {
   def parseConfig(path: Path): Config = {
+    if (!new File(path.toUri).exists()) {
+      return null
+    }
+
     val configString = Files.readAllLines(path).asScala.mkString("")
     val configJson = new JSONObject(configString)
 

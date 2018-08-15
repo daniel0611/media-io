@@ -9,7 +9,6 @@ import org.json.JSONException
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
 // TODO regex filter for episodeTitle
-// TODO interactive mode without config file
 
 object Main {
   val movieListFileName = "movie-data.xz"
@@ -17,10 +16,6 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val cliConf = CLIConfig.parse(args)
-    if (cliConf.interactive) {
-      InteractiveMode.start()
-      System.exit(0)
-    }
     var config: Config = null
 
     try {
@@ -34,7 +29,18 @@ object Main {
         System.exit(1)
     }
 
-    println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
+    if (config != null)
+      println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
+
+    if (cliConf.interactive) {
+      InteractiveMode.start()
+      System.exit(0)
+    }
+
+    if (config == null) {
+      println("Config file does not exist!")
+      System.exit(1)
+    }
 
     println("Launching Movie Downloader")
     downloadMovies(config)
