@@ -76,7 +76,7 @@ object InteractiveMode {
       val allowedRange = 1 to movies.length
 
       if (allowedRange.contains(id))
-        dl.downloadMovie(movies(id - 1)) // TODO get Path from somewhere and not download into "./"
+        dl.downloadMovie(movies(id - 1))
     }
   }
 

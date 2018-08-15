@@ -10,6 +10,7 @@ import scala.collection.parallel.ParSeq
 
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
+// TODO entry in config file to override movie data tmp folder
 
 object Main {
   val movieListFileName = "movie-data.xz"
