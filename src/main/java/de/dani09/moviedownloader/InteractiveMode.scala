@@ -1,18 +1,18 @@
 package de.dani09.moviedownloader
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
 import de.dani09.moviedownloader.config.{Config, MovieFilter}
 
 object InteractiveMode {
-  def start(): Unit = {
+  def start(config: Config): Unit = {
     println("Entering interactive mode!")
-    val dl = new MovieDownloader(new Config(Paths.get("./"), 0, 0, 0, List[MovieFilter]()))
+    val s = new Scanner(System.in)
+    val dl = new MovieDownloader(new Config(getPath(config, s), 0, 0, 0, List[MovieFilter]()))
 
     Main.saveMovieData()
     val movies = Main.getMovies(dl)
-    val s = new Scanner(System.in)
 
     while (true) {
       println()
@@ -25,6 +25,16 @@ object InteractiveMode {
     }
   }
 
+  private def getPath(config: Config, s: Scanner): Path = {
+    if (config == null || config.downloadDirectory == null) {
+      print("Please enter an download Directory (default is \"./\")")
+
+      val path = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse("./")
+      Paths.get(path)
+    } else {
+      config.downloadDirectory
+    }
+  }
 
   private def displayMovies(dl: MovieDownloader, s: Scanner, movies: List[Movie]): Unit = {
     if (movies.isEmpty) {

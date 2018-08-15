@@ -34,7 +34,7 @@ object Main {
       println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
 
     if (cliConf.interactive) {
-      InteractiveMode.start()
+      InteractiveMode.start(config)
       System.exit(0)
     }
 
