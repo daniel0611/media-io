@@ -44,15 +44,20 @@ object Config {
     val filterArray = configJson.getJSONArray("filters")
     val filters = (for (i <- 0 until filterArray.length()) yield i)
       .map(index => filterArray.getJSONObject(index))
-      .map(f => new MovieFilter(f.getString("tvChannel"), f.getString("seriesTitle").r))
+      .map(f => parseMovieFilter(f))
       .toList
 
     new Config(
       downloadDirectory = Paths.get(configJson.getString("downloadDirectory")),
-      minimumSize = configJson.getInt("minimumSize"),
-      minimumLength = configJson.getLong("minimumLength"),
-      maxDaysOld = configJson.getInt("maxDaysOld"),
+      minimumSize = configJson.optInt("minimumSize", 0),
+      minimumLength = configJson.optLong("minimumLength", 0),
+      maxDaysOld = configJson.optInt("maxDaysOld", 0),
       filters
     )
   }
+
+  def parseMovieFilter(j: JSONObject): MovieFilter = new MovieFilter(
+    tvChannel = j.optString("tvChannel", ""),
+    seriesTitle = j.optString("seriesTitle", ".+").r
+  )
 }
