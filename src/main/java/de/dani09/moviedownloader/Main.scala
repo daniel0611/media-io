@@ -6,6 +6,8 @@ import java.nio.file.{Path, Paths}
 import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.json.JSONException
 
+import scala.collection.parallel.ParSeq
+
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
 
@@ -49,7 +51,7 @@ object Main {
     val downloader = new MovieDownloader(config)
     saveMovieData(downloader = downloader)
 
-    var movies: List[Movie] = getMovies(downloader)
+    var movies: ParSeq[Movie] = getMovies(downloader)
 
     movies = movies.filter(x => config.matchesMovie(x))
     println(s"${movies.length} Movies matched Filters")
@@ -87,7 +89,7 @@ object Main {
     Paths.get(tmp, movieListFileName)
   }
 
-  def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): List[Movie] = {
+  def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
     println("Reading Movie Data")
     val movies = downloader.getMovieList(path)
     println("Parsed Movie Data successfully")

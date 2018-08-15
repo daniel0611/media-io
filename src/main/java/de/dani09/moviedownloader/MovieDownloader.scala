@@ -12,6 +12,7 @@ import de.mediathekview.mlib.filmlisten.FilmlisteLesen
 import me.tongfei.progressbar.{ProgressBarBuilder, ProgressBarStyle}
 
 import scala.collection.JavaConverters._
+import scala.collection.parallel.ParSeq
 
 class MovieDownloader(config: Config) {
 
@@ -25,7 +26,7 @@ class MovieDownloader(config: Config) {
   }
 
   //noinspection SpellCheckingInspection
-  def getMovieList(movieDataPath: Path): List[Movie] = {
+  def getMovieList(movieDataPath: Path): ParSeq[Movie] = {
     val l = new FilmlisteLesen() // TODO parse without Library
 
     var done = false
@@ -48,9 +49,9 @@ class MovieDownloader(config: Config) {
 
     // Convert from "DatenFilm" to Movie
     filme.asScala
+      .par
       .map(m => DatenFilmToMovieConverter.convert(m))
       .filter(_ != null)
-      .toList
   }
 
   def downloadMovie(movie: Movie): Unit = {
