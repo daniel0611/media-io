@@ -32,13 +32,13 @@ object InteractiveMode {
       return
     }
 
-    print("Do you want to see them? (Y/n)")
+    print("Do you want to see them? (Y/n) ")
     val answer = s.nextLine()
 
     if (answer.toLowerCase != "n") {
 
       if (movies.length > 50) {
-        print("That are a lot of Movies! Are you sure? (y/N)")
+        print("That are a lot of Movies! Are you sure? (y/N) ")
         val answer = s.nextLine()
         if (answer.toLowerCase != "y") return
       }
