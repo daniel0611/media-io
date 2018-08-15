@@ -15,6 +15,9 @@ sourceSets.test.scala.srcDir "src/test/java"
 sourceSets.test.java.srcDirs = []
 
 repositories {
+    maven {
+        url  "https://dl.bintray.com/dani09/ProgressBar"
+    }
     mavenCentral()
     jcenter()
 }
