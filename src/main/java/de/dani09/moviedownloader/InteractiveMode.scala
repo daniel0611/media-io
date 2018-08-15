@@ -75,12 +75,14 @@ object InteractiveMode {
     println("Enter an TvChannel:")
     val channel = s.nextLine()
 
-    println("Enter an SeriesTitle Regex:")
-    val seriesTitle = s.nextLine().r
+    println("Enter an SeriesTitle Regex (empty for \".+\"):")
+    val seriesTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
+
+    println("Enter an EpisodeTitle Regex (empty for \".+\"):")
+    val episodeTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
 
     println("Creating MovieFilter")
-
-    val filter = new MovieFilter(channel, seriesTitle)
+    val filter = new MovieFilter(channel, seriesTitle, episodeTitle)
     filter
   }
 }

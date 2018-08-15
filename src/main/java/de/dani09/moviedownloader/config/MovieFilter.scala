@@ -7,15 +7,17 @@ import scala.util.matching.Regex
 
 class MovieFilter(
                    val tvChannel: String,
-                   val seriesTitle: Regex
+                   val seriesTitle: Regex,
+                   val episodeTitle: Regex
                  ) {
 
   def matchesMovie(movie: Movie): Boolean = {
 
     if (tvChannel != "" && tvChannel.toLowerCase() != movie.tvChannel.toLowerCase()) return false
 
-    val matches = seriesTitle.findFirstIn(movie.seriesTitle)
+    val matchesSeries = seriesTitle.findFirstIn(movie.seriesTitle).nonEmpty
+    val matchesEpisode = episodeTitle.findFirstIn(movie.episodeTitle).nonEmpty
 
-    matches.nonEmpty
+    matchesSeries && matchesEpisode
   }
 }

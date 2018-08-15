@@ -8,7 +8,6 @@ import org.json.JSONException
 
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
-// TODO regex filter for episodeTitle
 
 object Main {
   val movieListFileName = "movie-data.xz"
