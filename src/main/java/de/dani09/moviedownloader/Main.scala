@@ -67,12 +67,13 @@ object Main {
       println("No new Movies to download!")
     }
 
-    movies.foreach(x => {
-      println(s"[${movies.indexOf(x) + 1}/${movies.length}] Will download following Movie:")
-      x.printInfo()
-      downloader.downloadMovie(x)
-      println()
-    })
+    movies.toList
+      .foreach(x => {
+        println(s"[${movies.indexOf(x) + 1}/${movies.length}] Will download following Movie:")
+        x.printInfo()
+        downloader.downloadMovie(x)
+        println()
+      })
 
     println("Done!")
   }
