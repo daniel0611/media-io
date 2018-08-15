@@ -32,7 +32,7 @@ object InteractiveMode {
       return
     }
 
-    println("Do you want to see them? (Y/n)")
+    print("Do you want to see them? (Y/n)")
     val answer = s.nextLine()
 
     if (answer.toLowerCase != "n") {
