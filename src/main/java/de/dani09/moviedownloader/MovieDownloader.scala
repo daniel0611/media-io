@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader
 
-import java.io.{BufferedReader, File, FileOutputStream, InputStreamReader}
+import java.io.{BufferedReader, File, FileOutputStream}
 import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Calendar
@@ -89,7 +89,6 @@ class MovieDownloader(config: Config) {
         .showSpeed()
         .build()
 
-      reader = new BufferedReader(new InputStreamReader(input))
       val data = new Array[Byte](1024)
       var count = 0
 
