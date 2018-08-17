@@ -1,6 +1,7 @@
 package de.dani09.moviedownloader.config
 
 import java.io.File
+import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
@@ -14,7 +15,8 @@ class Config(
               val minimumSize: Int,
               val minimumLength: Long,
               val maxDaysOld: Int,
-              val movieFilters: List[MovieFilter]
+              val movieFilters: List[MovieFilter],
+              val movieDataSource: URL
             ) {
 
   def matchesMovie(movie: Movie): Boolean = {
@@ -57,7 +59,8 @@ object Config {
       minimumSize = configJson.optInt("minimumSize", 0),
       minimumLength = configJson.optLong("minimumLength", 0),
       maxDaysOld = configJson.optInt("maxDaysOld", 0),
-      filters
+      movieFilters = filters,
+      movieDataSource = new URL(configJson.optString("movieDataSource", getMovieDataSourceDefaultValue))
     )
   }
 
@@ -66,4 +69,6 @@ object Config {
     seriesTitle = j.optString("seriesTitle", ".+").r,
     episodeTitle = j.optString("episodeTitle", ".+").r
   )
+
+  def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
 }

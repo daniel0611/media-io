@@ -1,17 +1,22 @@
 package de.dani09.moviedownloader
 
+import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
 import de.dani09.moviedownloader.config.{Config, MovieFilter}
 
 object InteractiveMode {
+  val movieDataSource = new URL(Config.getMovieDataSourceDefaultValue) // TODO respect url in config
+
   def start(config: Config): Unit = {
     println("Entering interactive mode!")
     val s = new Scanner(System.in)
-    val dl = new MovieDownloader(new Config(getPath(config, s), 0, 0, 0, List[MovieFilter]()))
+    val dl = new MovieDownloader(new Config(getPath(config, s),
+      minimumSize = 0, minimumLength = 0, maxDaysOld = 0,
+      movieFilters = List[MovieFilter](), movieDataSource = movieDataSource))
 
-    Main.saveMovieData()
+    Main.saveMovieData(source = movieDataSource)
     val movies = Main.getMovies(dl)
 
     while (true) {

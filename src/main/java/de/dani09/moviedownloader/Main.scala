@@ -15,7 +15,6 @@ import scala.collection.parallel.ParSeq
 
 object Main {
   val movieListFileName = "movie-data.xz"
-  val movieDataSource = new URL("https://verteiler1.mediathekview.de/Filmliste-akt.xz")
 
   def main(args: Array[String]): Unit = {
     val cliConf = CLIConfig.parse(args)
@@ -51,7 +50,7 @@ object Main {
 
   def downloadMovies(config: Config): Unit = {
     val downloader = new MovieDownloader(config)
-    saveMovieData(downloader = downloader)
+    saveMovieData(downloader = downloader, source = config.movieDataSource)
 
     var movies: ParSeq[Movie] = getMovies(downloader)
 
@@ -82,8 +81,8 @@ object Main {
 
   def saveMovieData(path: Path = getMovieListTmpPath,
                     downloader: MovieDownloader = new MovieDownloader(null),
-                    source: URL = movieDataSource): Unit = {
-    downloader.saveMovieData(getMovieListTmpPath, movieDataSource)
+                    source: URL): Unit = {
+    downloader.saveMovieData(getMovieListTmpPath, source)
   }
 
   def getMovieListTmpPath: Path = {
