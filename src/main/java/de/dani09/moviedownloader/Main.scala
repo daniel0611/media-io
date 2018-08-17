@@ -11,10 +11,11 @@ import scala.collection.parallel.ParSeq
 // TODO Windows support??
 // TODO entry in config file to override movieDataSource
 // TODO entry in config file to override movie data tmp folder
+// TODO add readme with explanations
 
 object Main {
   val movieListFileName = "movie-data.xz"
-  val movieDataSource = new URL("http://verteiler1.mediathekview.de/Filmliste-akt.xz")
+  val movieDataSource = new URL("https://verteiler1.mediathekview.de/Filmliste-akt.xz")
 
   def main(args: Array[String]): Unit = {
     val cliConf = CLIConfig.parse(args)
