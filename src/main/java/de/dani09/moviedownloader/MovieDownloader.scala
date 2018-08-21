@@ -129,7 +129,7 @@ class MovieDownloader(config: Config) {
 
     val tvChannel = movie.tvChannel
     val seriesTitle = if (isOsWindows) movie.seriesTitle else movie.seriesTitle.replaceAll("/", "|")
-    val episodeTitle = if (isOsWindows) movie.seriesTitle else movie.episodeTitle.replaceAll("/", "|")
+    val episodeTitle = if (isOsWindows) movie.episodeTitle else movie.episodeTitle.replaceAll("/", "|")
 
     val pathString = s"${config.downloadDirectory}/$tvChannel/$seriesTitle/$episodeTitle-$dateString.$fileExtension"
     Paths.get(pathString)
