@@ -128,8 +128,8 @@ class MovieDownloader(config: Config) {
     val fileExtension = getFileExtension(movie.downloadUrl)
 
     val tvChannel = movie.tvChannel
-    val seriesTitle = movie.seriesTitle.replaceAll("/", "_")
-    val episodeTitle = movie.episodeTitle.replaceAll("/", "_")
+    val seriesTitle = movie.seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
+    val episodeTitle = movie.episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
 
     val pathString = s"${config.downloadDirectory}/$tvChannel/$seriesTitle/$episodeTitle-$dateString.$fileExtension"
     Paths.get(pathString)
