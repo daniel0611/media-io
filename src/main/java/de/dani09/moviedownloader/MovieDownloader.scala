@@ -128,14 +128,12 @@ class MovieDownloader(config: Config) {
     val fileExtension = getFileExtension(movie.downloadUrl)
 
     val tvChannel = movie.tvChannel
-    val seriesTitle = if (isOsWindows) movie.seriesTitle else movie.seriesTitle.replaceAll("/", "_")
-    val episodeTitle = if (isOsWindows) movie.episodeTitle else movie.episodeTitle.replaceAll("/", "_")
+    val seriesTitle = movie.seriesTitle.replaceAll("/", "_")
+    val episodeTitle = movie.episodeTitle.replaceAll("/", "_")
 
     val pathString = s"${config.downloadDirectory}/$tvChannel/$seriesTitle/$episodeTitle-$dateString.$fileExtension"
     Paths.get(pathString)
   }
-
-  private def isOsWindows: Boolean = System.getProperty("os.name").toLowerCase.contains("windows")
 
   private def getFileExtension(url: URL): String = {
     url.getPath
