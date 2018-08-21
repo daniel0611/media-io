@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader
 
-import java.io.{BufferedReader, File, FileOutputStream}
+import java.io.{File, FileOutputStream}
 import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Calendar
@@ -63,7 +63,6 @@ class MovieDownloader(config: Config) {
 
   private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false): Unit = {
     var out: FileOutputStream = null
-    var reader: BufferedReader = null
 
     try {
       val connection = downloadUrl.openConnection()
@@ -103,10 +102,6 @@ class MovieDownloader(config: Config) {
       }
 
     } finally {
-      if (reader != null) {
-        reader.close()
-      }
-
       if (out != null) {
         out.close()
       }

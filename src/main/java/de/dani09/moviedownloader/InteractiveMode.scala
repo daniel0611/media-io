@@ -32,7 +32,7 @@ object InteractiveMode {
 
   private def getPath(config: Config, s: Scanner): Path = {
     if (config == null || config.downloadDirectory == null) {
-      print("Please enter an download Directory (default is \"./\")")
+      print("Please enter an download Directory (default is \"./\") ")
 
       val path = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse("./")
       Paths.get(path)
