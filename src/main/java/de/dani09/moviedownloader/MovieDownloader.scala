@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader
 
-import java.io.{File, FileOutputStream}
+import java.io.{File, FileNotFoundException, FileOutputStream}
 import java.net.URL
 import java.nio.file.{Files, Path}
 
@@ -62,12 +62,12 @@ class MovieDownloader(config: Config) {
 
   private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false): Unit = {
     var out: FileOutputStream = null
+    val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
     try {
       val connection = downloadUrl.openConnection()
       val fullSize = connection.getContentLengthLong
       val input = connection.getInputStream
-      val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
       Files.createDirectories(destination.getParent)
       val file = new File(destination.toUri)
@@ -100,6 +100,8 @@ class MovieDownloader(config: Config) {
         }
       }
 
+    } catch {
+      case _: FileNotFoundException => println(s"$taskName cloud not be downloaded because it does not exist on the Server") // TODO filter non existing stuff in getMovieList
     } finally {
       if (out != null) {
         out.close()
