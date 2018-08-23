@@ -8,8 +8,6 @@ import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
 
-// TODO entry in config file to override movieDataSource
-// TODO entry in config file to override movie data tmp folder
 // TODO add readme with explanations
 
 object Main {

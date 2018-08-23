@@ -72,7 +72,6 @@ object InteractiveMode {
 
   private def downloadMovie(dl: MovieDownloader, s: Scanner, movies: List[Movie]): Unit = {
     println("Do you want to download one? (0 or empty String if no else id)")
-    println("Be sure to be in the download directory as it will download into the current folder")
     val idString = s.nextLine()
 
     if (idString.length != 0 && idString.forall(_.isDigit)) {
