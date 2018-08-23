@@ -2,8 +2,7 @@ package de.dani09.moviedownloader
 
 import java.io.{File, FileOutputStream}
 import java.net.URL
-import java.nio.file.{Files, Path, Paths}
-import java.util.Calendar
+import java.nio.file.{Files, Path}
 
 import de.dani09.moviedownloader.config.Config
 import de.mediathekview.mlib.daten.ListeFilme
@@ -120,27 +119,6 @@ class MovieDownloader(config: Config) {
   }
 
   private def getMovieSavePath(movie: Movie) = {
-    val date = movie.releaseDate
-    val calendar = Calendar.getInstance()
-    calendar.setTime(date)
-
-    val dateString = s"${calendar.get(Calendar.DAY_OF_MONTH)}.${calendar.get(Calendar.MONTH)}.${calendar.get(Calendar.YEAR)}"
-    val fileExtension = getFileExtension(movie.downloadUrl)
-
-    val tvChannel = movie.tvChannel
-    val seriesTitle = movie.seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
-    val episodeTitle = movie.episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
-
-    val pathString = s"${config.downloadDirectory}/$tvChannel/$seriesTitle/$episodeTitle-$dateString.$fileExtension"
-    Paths.get(pathString)
-  }
-
-  private def getFileExtension(url: URL): String = {
-    url.getPath
-      .split("/")
-      .lastOption
-      .getOrElse(".mp4")
-      .split("\\.")
-      .last
+    movie.getSavePath(config.downloadDirectory)
   }
 }

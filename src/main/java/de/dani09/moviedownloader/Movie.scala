@@ -1,8 +1,8 @@
 package de.dani09.moviedownloader
 
 import java.net.URL
-import java.util.Date
-
+import java.nio.file.{Path, Paths}
+import java.util.{Calendar, Date}
 
 class Movie(val downloadUrl: URL,
             val tvChannel: String,
@@ -25,5 +25,28 @@ class Movie(val downloadUrl: URL,
     println(s"SizeInMb\t\t$sizeInMb")
 
     if (withEmptyLineAtEnd) println()
+  }
+
+  def getSavePath(downloadDirectory: Path): Path = {
+    val calendar = Calendar.getInstance()
+    calendar.setTime(releaseDate)
+
+    val dateString = s"${calendar.get(Calendar.DAY_OF_MONTH)}.${calendar.get(Calendar.MONTH)}.${calendar.get(Calendar.YEAR)}"
+    val fileExtension = getFileExtension(downloadUrl)
+
+    val title = seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
+    val episode = episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
+
+    val pathString = s"$downloadDirectory/$tvChannel/$title/$episode-$dateString.$fileExtension"
+    Paths.get(pathString)
+  }
+
+  private def getFileExtension(url: URL): String = {
+    url.getPath
+      .split("/")
+      .lastOption
+      .getOrElse(".mp4")
+      .split("\\.")
+      .last
   }
 }
