@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader
 
-import java.io.{File, FileNotFoundException, FileOutputStream}
+import java.io.{File, FileOutputStream}
 import java.net.URL
 import java.nio.file.{Files, Path}
 
@@ -85,10 +85,9 @@ class MovieDownloader(config: Config) {
       Http.get(downloadUrl.toString)
         .setOutputStream(out)
         .addProgressListener(new HttpListener2ProgressBar(pbb))
+        .handleRedirects(10)
         .execute()
 
-    } catch {
-      case _: FileNotFoundException => println(s"$taskName cloud not be downloaded because it does not exist on the Server") // TODO filter non existing stuff in getMovieList
     } finally {
       if (out != null) {
         out.close()

@@ -22,7 +22,10 @@ object InteractiveMode {
     while (true) {
       println()
       val filter = createMovieFilter(s)
-      val matchedMovies = movies.filter(m => filter.matchesMovie(m)).toList
+      val matchedMovies = movies
+        .filter(m => filter.matchesMovie(m))
+        .filter(_.exists())
+        .toList
 
       println(s"${matchedMovies.length} Movies matched entered Filter!")
 
