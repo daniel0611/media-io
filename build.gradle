@@ -29,7 +29,7 @@ dependencies {
     implementation 'org.json:json:20180813'
     implementation 'me.tongfei:progressbar:0.7.1'
     implementation 'com.github.scopt:scopt_2.12:3.7.0'
-    implementation 'de.dani09:dani-http:0.4.0'
+    implementation 'de.dani09:dani-http:0.4.1'
 }
 
 jar {
