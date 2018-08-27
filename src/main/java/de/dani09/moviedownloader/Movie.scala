@@ -4,6 +4,8 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.{Calendar, Date}
 
+import de.dani09.http.Http
+
 class Movie(val downloadUrl: URL,
             val tvChannel: String,
             val seriesTitle: String,
@@ -48,5 +50,14 @@ class Movie(val downloadUrl: URL,
       .getOrElse(".mp4")
       .split("\\.")
       .last
+  }
+
+  def exists(): Boolean = {
+    val responseCode = Http.head(downloadUrl.toString)
+      .handleRedirects(10)
+      .execute()
+      .getResponseCode
+
+    (200 to 299).contains(responseCode)
   }
 }

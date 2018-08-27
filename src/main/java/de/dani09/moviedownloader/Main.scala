@@ -51,7 +51,9 @@ object Main {
 
     var movies: ParSeq[Movie] = getMovies(downloader)
 
-    movies = movies.filter(x => config.matchesMovie(x))
+    movies = movies
+      .filter(x => config.matchesMovie(x))
+      .filter(_.exists())
     println(s"${movies.length} Movies matched Filters")
 
     movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))

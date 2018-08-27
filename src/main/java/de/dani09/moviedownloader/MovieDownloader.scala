@@ -1,9 +1,10 @@
 package de.dani09.moviedownloader
 
-import java.io.{File, FileNotFoundException, FileOutputStream}
+import java.io.{File, FileOutputStream}
 import java.net.URL
 import java.nio.file.{Files, Path}
 
+import de.dani09.http.Http
 import de.dani09.moviedownloader.config.Config
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
@@ -65,10 +66,6 @@ class MovieDownloader(config: Config) {
     val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
     try {
-      val connection = downloadUrl.openConnection()
-      val fullSize = connection.getContentLengthLong
-      val input = connection.getInputStream
-
       Files.createDirectories(destination.getParent)
       val file = new File(destination.toUri)
       if (isFileUpToDate(file, downloadUrl)) {
@@ -79,29 +76,18 @@ class MovieDownloader(config: Config) {
 
       println(s"Downloading $taskName")
 
-      val pb = new ProgressBarBuilder()
+      val pbb = new ProgressBarBuilder()
         .setStyle(ProgressBarStyle.ASCII)
         .setUnit("MB", 1048576)
-        .setInitialMax(fullSize)
         .setUpdateIntervalMillis(1000)
         .showSpeed()
-        .build()
 
-      val data = new Array[Byte](1024)
-      var count = 0
+      Http.get(downloadUrl.toString)
+        .setOutputStream(out)
+        .addProgressListener(new HttpListener2ProgressBar(pbb))
+        .handleRedirects(10)
+        .execute()
 
-      while (count != -1) {
-        count = input.read(data, 0, 1024)
-        if (count != -1) {
-          out.write(data, 0, count)
-          pb.stepBy(count)
-        } else {
-          pb.close()
-        }
-      }
-
-    } catch {
-      case _: FileNotFoundException => println(s"$taskName cloud not be downloaded because it does not exist on the Server") // TODO filter non existing stuff in getMovieList
     } finally {
       if (out != null) {
         out.close()

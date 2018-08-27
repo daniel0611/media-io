@@ -16,7 +16,7 @@ sourceSets.test.java.srcDirs = []
 
 repositories {
     maven {
-        url  "https://dl.bintray.com/dani09/ProgressBar"
+        url "https://dl.bintray.com/dani09/ProgressBar"
     }
     mavenCentral()
     jcenter()
@@ -29,12 +29,13 @@ dependencies {
     implementation 'org.json:json:20180813'
     implementation 'me.tongfei:progressbar:0.7.1'
     implementation 'com.github.scopt:scopt_2.12:3.7.0'
+    implementation 'de.dani09:dani-http:0.4.0'
 }
 
 jar {
     manifest {
         attributes(
-                'Class-Path': configurations.compileClasspath.files.collect {"$it.name"}.join(' '),
+                'Class-Path': configurations.compileClasspath.files.collect { "$it.name" }.join(' '),
                 'Main-Class': 'de.dani09.moviedownloader.Main'
         )
     }
