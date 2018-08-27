@@ -66,8 +66,6 @@ class MovieDownloader(config: Config) {
     val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
     try {
-      val connection = downloadUrl.openConnection()
-
       Files.createDirectories(destination.getParent)
       val file = new File(destination.toUri)
       if (isFileUpToDate(file, downloadUrl)) {
