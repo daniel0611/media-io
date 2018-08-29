@@ -23,8 +23,8 @@ class Movie(val downloadUrl: URL,
     println(s"EpisodeTitle\t\t$episodeTitle") // TODO Broken sometimes 2 tabs sometimes only one needed
     println(s"ReleaseDate\t\t$releaseDate")
     println(s"Description\t\t$description")
-    println(s"Length\t\t\t$lengthInMinutes")
-    println(s"SizeInMb\t\t$sizeInMb")
+    println(s"Length\t\t\t$lengthInMinutes Minutes")
+    println(s"Size\t\t\t${sizeInMb}MB")
 
     if (withEmptyLineAtEnd) println()
   }
@@ -43,14 +43,12 @@ class Movie(val downloadUrl: URL,
     Paths.get(pathString)
   }
 
-  private def getFileExtension(url: URL): String = {
-    url.getPath
-      .split("/")
-      .lastOption
-      .getOrElse(".mp4")
-      .split("\\.")
-      .last
-  }
+  private def getFileExtension(url: URL): String = url.getPath
+    .split("/")
+    .lastOption
+    .getOrElse(".mp4")
+    .split("\\.")
+    .last
 
   def exists(): Boolean = {
     val responseCode = Http.head(downloadUrl.toString)
