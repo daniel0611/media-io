@@ -13,7 +13,7 @@ class Movie(val downloadUrl: URL,
             val releaseDate: Date,
             val description: String,
             val lengthInMinutes: Long,
-            val sizeInMb: Int
+            var sizeInMb: Int
            ) {
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
@@ -23,6 +23,7 @@ class Movie(val downloadUrl: URL,
     println(s"EpisodeTitle:\t$episodeTitle")
     println(s"ReleaseDate:\t$releaseDate")
     println(s"Length:\t\t$lengthInMinutes Minutes")
+    println(s"Size:\t\t$sizeInMb Mb")
 
     if (withEmptyLineAtEnd) println()
   }
@@ -49,11 +50,17 @@ class Movie(val downloadUrl: URL,
     .last
 
   def exists(): Boolean = {
-    val responseCode = Http.head(downloadUrl.toString)
+    val response = Http.head(downloadUrl.toString)
       .handleRedirects(10)
       .execute()
-      .getResponseCode
 
-    (200 to 299).contains(responseCode)
+    val exists = (200 to 299).contains(response.getResponseCode)
+
+    if (exists) {
+      val size = response.getContentLength / (1024 * 1024)
+      sizeInMb = size.toInt // Updating to more accurate size than the Movie List provides
+    }
+
+    exists
   }
 }
