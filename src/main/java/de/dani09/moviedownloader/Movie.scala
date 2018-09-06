@@ -17,14 +17,12 @@ class Movie(val downloadUrl: URL,
            ) {
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
-    println(s"DownloadUrl\t\t$downloadUrl")
-    println(s"Station\t\t\t$tvChannel")
-    println(s"SeriesTitle\t\t$seriesTitle")
-    println(s"EpisodeTitle\t\t$episodeTitle") // TODO Broken sometimes 2 tabs sometimes only one needed
-    println(s"ReleaseDate\t\t$releaseDate")
-    println(s"Description\t\t$description")
-    println(s"Length\t\t\t$lengthInMinutes Minutes")
-    println(s"Size\t\t\t${sizeInMb}MB")
+    println(s"DownloadUrl:\t$downloadUrl")
+    println(s"TvStation:\t$tvChannel")
+    println(s"SeriesTitle:\t$seriesTitle")
+    println(s"EpisodeTitle:\t$episodeTitle")
+    println(s"ReleaseDate:\t$releaseDate")
+    println(s"Length:\t\t$lengthInMinutes Minutes")
 
     if (withEmptyLineAtEnd) println()
   }
