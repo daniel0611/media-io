@@ -69,7 +69,7 @@ class MovieDownloader(config: Config) {
       Files.createDirectories(destination.getParent)
       val file = new File(destination.toUri)
       if (isFileUpToDate(file, downloadUrl)) {
-        println(s"$taskName already exists and has same Length! Will not re-download!")
+        println(s"$taskName is already up-to-date")
         return
       }
       out = new FileOutputStream(file)

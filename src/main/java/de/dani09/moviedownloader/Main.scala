@@ -41,7 +41,6 @@ object Main {
       System.exit(1)
     }
 
-    println("Launching Movie Downloader")
     downloadMovies(config)
   }
 
@@ -68,10 +67,10 @@ object Main {
     }
 
     movies.toList
-      .foreach(x => {
-        println(s"[${movies.indexOf(x) + 1}/${movies.length}] Will download following Movie:")
-        x.printInfo()
-        downloader.downloadMovie(x)
+      .foreach(mov => {
+        println(s"[${movies.indexOf(mov) + 1}/${movies.length}] Will download following Movie:")
+        mov.printInfo()
+        downloader.downloadMovie(mov)
         println()
       })
 
