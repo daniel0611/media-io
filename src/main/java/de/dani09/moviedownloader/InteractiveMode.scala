@@ -22,6 +22,8 @@ object InteractiveMode {
     while (true) {
       println()
       val filter = createMovieFilter(s)
+
+      println("Finding matches...")
       val matchedMovies = movies
         .filter(m => filter.matchesMovie(m))
         .filter(_.exists())
@@ -74,7 +76,7 @@ object InteractiveMode {
   }
 
   private def downloadMovie(dl: MovieDownloader, s: Scanner, movies: List[Movie]): Unit = {
-    println("Do you want to download one? (0 or empty String if no else id)")
+    println("Do you want to download one? (0 or empty String if no else id) ")
     val idString = s.nextLine()
 
     if (idString.length != 0 && idString.forall(_.isDigit)) {
@@ -88,17 +90,15 @@ object InteractiveMode {
   }
 
   def createMovieFilter(s: Scanner): MovieFilter = {
-    println("Creating MovieFilter")
     println("Enter an TvChannel:")
     val channel = s.nextLine()
 
-    println("Enter an SeriesTitle Regex (empty for \".+\"):")
+    println("Enter an SeriesTitle Regex (empty to match anything) ")
     val seriesTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
 
-    println("Enter an EpisodeTitle Regex (empty for \".+\"):")
+    println("Enter an EpisodeTitle Regex (empty to match anything) ")
     val episodeTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
 
-    println("Creating MovieFilter")
     val filter = new MovieFilter(channel, seriesTitle, episodeTitle)
     filter
   }
