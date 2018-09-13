@@ -64,11 +64,11 @@ object Config {
     )
   }
 
-  def parseMovieFilter(j: JSONObject): MovieFilter = new MovieFilter(
+  private def parseMovieFilter(j: JSONObject): MovieFilter = new MovieFilter(
     tvChannel = j.optString("tvChannel", ""),
     seriesTitle = j.optString("seriesTitle", ".+").r,
     episodeTitle = j.optString("episodeTitle", ".+").r
   )
 
-  def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
+  private def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
 }
