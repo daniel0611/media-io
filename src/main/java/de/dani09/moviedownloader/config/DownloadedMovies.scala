@@ -21,7 +21,9 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
       .foldLeft(new JSONArray())((arr, x) => arr.put(x))
       .toString
 
-    new FileWriter(file).write(jsonString)
+    val fw = new FileWriter(file)
+    fw.write(jsonString)
+    fw.close()
   }
 
   def addMovie(m: Movie): Unit = movies += m
