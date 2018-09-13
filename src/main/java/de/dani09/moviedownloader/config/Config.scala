@@ -70,5 +70,5 @@ object Config {
     episodeTitle = j.optString("episodeTitle", ".+").r
   )
 
-  private def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
+  def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
 }
