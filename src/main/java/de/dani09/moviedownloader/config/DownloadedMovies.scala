@@ -13,6 +13,8 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
 
   def this(movies: List[Movie]) = this(movies.to[ListBuffer])
 
+  def this() = this(ListBuffer[Movie]())
+
   def serialize(config: Config): Unit = {
     val file = DownloadedMovies.getListFile(config)
 
@@ -34,25 +36,31 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
 object DownloadedMovies {
   def deserialize(config: Config): DownloadedMovies = {
     val file = getListFile(config)
-    if (!file.exists()) return null
+    if (!file.exists()) new DownloadedMovies()
 
-    val text = Source.fromFile(file).getLines().mkString("")
-    val arr = new JSONArray(text)
+    try {
+      val text = Source.fromFile(file).getLines().mkString("")
+      val arr = new JSONArray(text)
 
-    val movies = (for (i <- 0 until arr.length()) yield i)
-      .par
-      .map(index => arr.getJSONObject(index))
-      .map(j => {
-        try {
-          Movie.fromJson(j)
-        } catch {
-          case _: JSONException => null
-        }
-      })
-      .filter(_ != null)
-      .toList
+      val movies = (for (i <- 0 until arr.length()) yield i)
+        .par
+        .map(index => arr.getJSONObject(index))
+        .map(j => {
+          try {
+            Movie.fromJson(j)
+          } catch {
+            case _: JSONException => null
+          }
+        })
+        .filter(_ != null)
+        .toList
 
-    new DownloadedMovies(movies)
+      new DownloadedMovies(movies)
+    } catch {
+      case _: Throwable =>
+        println("Couldn't parse downloaded-movies.json!")
+        new DownloadedMovies()
+    }
   }
 
   private def getListFile(config: Config): File = Paths
