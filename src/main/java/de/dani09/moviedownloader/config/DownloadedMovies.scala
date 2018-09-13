@@ -6,9 +6,13 @@ import java.nio.file.Paths
 import de.dani09.moviedownloader.Movie
 import org.json.{JSONArray, JSONException}
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-class DownloadedMovies(val movies: List[Movie]) {
+class DownloadedMovies(private val movies: ListBuffer[Movie]) {
+
+  def this(movies: List[Movie]) = this(movies.to[ListBuffer])
+
   def serialize(config: Config): Unit = {
     val file = DownloadedMovies.getListFile(config)
 
@@ -19,6 +23,10 @@ class DownloadedMovies(val movies: List[Movie]) {
 
     new FileWriter(file).write(jsonString)
   }
+
+  def addMovie(m: Movie): Unit = movies += m
+
+  def getMovies: ListBuffer[Movie] = movies
 }
 
 object DownloadedMovies {
