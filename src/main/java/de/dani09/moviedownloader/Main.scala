@@ -3,7 +3,7 @@ package de.dani09.moviedownloader
 import java.net.URL
 import java.nio.file.{Path, Paths}
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config}
+import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
@@ -45,6 +45,8 @@ object Main {
   }
 
   def downloadMovies(config: Config): Unit = {
+    val downloadedMovies = DownloadedMovies.deserialize(config)
+
     val downloader = new MovieDownloader(config)
     saveMovieData(downloader = downloader, source = config.movieDataSource)
 
@@ -70,8 +72,12 @@ object Main {
       .foreach(mov => {
         println(s"[${movies.indexOf(mov) + 1}/${movies.length}] Will download following Movie:")
         mov.printInfo()
+
         downloader.downloadMovie(mov)
         println()
+
+        downloadedMovies.addMovie(mov)
+        downloadedMovies.serialize(config)
       })
 
     println("Done!")
