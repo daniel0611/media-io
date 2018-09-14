@@ -7,16 +7,14 @@ import java.util.Scanner
 import de.dani09.moviedownloader.config.{Config, MovieFilter}
 
 object InteractiveMode {
-  val movieDataSource = new URL(Config.getMovieDataSourceDefaultValue) // TODO respect url in config
-
   def start(config: Config): Unit = {
     println("Entering interactive mode!")
     val s = new Scanner(System.in)
     val dl = new MovieDownloader(new Config(getPath(config, s),
       minimumSize = 0, minimumLength = 0, maxDaysOld = 0,
-      movieFilters = List[MovieFilter](), movieDataSource = movieDataSource))
+      movieFilters = List[MovieFilter](), movieDataSource = getMovieDataSource(config)))
 
-    Main.saveMovieData(source = movieDataSource)
+    Main.saveMovieData(source = getMovieDataSource(config))
     val movies = Main.getMovies(dl)
 
     while (true) {
@@ -32,6 +30,14 @@ object InteractiveMode {
       println(s"${matchedMovies.length} Movies matched entered Filter!")
 
       displayMovies(dl, s, matchedMovies)
+    }
+  }
+
+  private def getMovieDataSource(c: Config): URL = {
+    if (c == null || c.movieDataSource == null) {
+      new URL(Config.getMovieDataSourceDefaultValue)
+    } else {
+      c.movieDataSource
     }
   }
 
