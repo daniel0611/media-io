@@ -16,9 +16,11 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   def this() = this(ListBuffer[Movie]())
 
   def serialize(config: Config): Unit = {
-    val file = DownloadedMovies.getListFile(config)
+    val file = DownloadedMovies.getDownloadedMoviesFile(config)
 
     val jsonString = movies
+      .groupBy(_.downloadUrl) // this...
+      .map(_._2.head) // ... and this filters duplicates with the same download url
       .map(_.toJson)
       .foldLeft(new JSONArray())((arr, x) => arr.put(x))
       .toString
@@ -35,7 +37,7 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
 
 object DownloadedMovies {
   def deserialize(config: Config): DownloadedMovies = {
-    val file = getListFile(config)
+    val file = getDownloadedMoviesFile(config)
     if (!file.exists()) new DownloadedMovies()
 
     try {
@@ -63,7 +65,7 @@ object DownloadedMovies {
     }
   }
 
-  private def getListFile(config: Config): File = Paths
+  private def getDownloadedMoviesFile(config: Config): File = Paths
     .get(config.downloadDirectory.toString, "./downloaded-movies.json")
     .toFile
 }
