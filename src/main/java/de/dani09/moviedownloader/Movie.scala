@@ -5,6 +5,7 @@ import java.nio.file.{Path, Paths}
 import java.util.{Calendar, Date}
 
 import de.dani09.http.Http
+import org.json.JSONObject
 
 class Movie(val downloadUrl: URL,
             val tvChannel: String,
@@ -63,4 +64,27 @@ class Movie(val downloadUrl: URL,
 
     exists
   }
+
+  def toJson: JSONObject = new JSONObject()
+    .put("downloadUrl", downloadUrl.toString)
+    .put("tvChannel", tvChannel)
+    .put("seriesTitle", seriesTitle)
+    .put("episodeTitle", episodeTitle)
+    .put("releaseDate", releaseDate.getTime)
+    .put("description", description)
+    .put("length", lengthInMinutes)
+    .put("size", sizeInMb)
+}
+
+object Movie {
+  def fromJson(j: JSONObject): Movie = new Movie(
+    downloadUrl = new URL(j.getString("downloadUrl")),
+    tvChannel = j.getString("tvChannel"),
+    seriesTitle = j.getString("seriesTitle"),
+    episodeTitle = j.getString("episodeTitle"),
+    releaseDate = new Date(j.getLong("releaseDate")),
+    description = j.getString("description"),
+    lengthInMinutes = j.getLong("length"),
+    sizeInMb = j.getInt("size")
+  )
 }
