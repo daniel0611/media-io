@@ -7,7 +7,8 @@ import scala.io.Source
 
 case class CLIConfig(
                       configPath: Path = null,
-                      interactive: Boolean = false
+                      interactive: Boolean = false,
+                      serveWebFrontend: Boolean = false
                     )
 
 object CLIConfig {
@@ -26,6 +27,16 @@ object CLIConfig {
       opt[Unit]('i', "interactive")
         .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies")
         .action((v, c) => c.copy(interactive = true))
+
+      opt[Unit]('s', "serve")
+        .action((v, c) => c.copy(serveWebFrontend = true))
+        .text("Serve the WebFrontend to watch the downloaded Movies in the Browser\n\t\t" +
+          "       Will open the Http server on port 80 or the Environment variable \"PORT\" if set")
+
+      checkConfig(c =>
+        if (c.serveWebFrontend && c.interactive) failure("Cannot start interactive Mode and serve the WebFrontend at the same Time!")
+        else success
+      )
 
       version("version").text("Displays the used Version")
       help("help").text("Displays this help page")
