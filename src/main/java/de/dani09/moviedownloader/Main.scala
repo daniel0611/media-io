@@ -41,6 +41,11 @@ object Main {
       System.exit(1)
     }
 
+    if (cliConf.serveWebFrontend) {
+      WebFrontendMode.start(config, cliConf)
+      System.exit(0)
+    }
+
     downloadMovies(config)
   }
 
