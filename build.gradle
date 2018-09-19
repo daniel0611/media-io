@@ -30,6 +30,12 @@ dependencies {
     implementation 'me.tongfei:progressbar:0.7.1'
     implementation 'com.github.scopt:scopt_2.12:3.7.0'
     implementation 'de.dani09:dani-http:0.4.1'
+
+    // scalatra
+    implementation  'org.scalatra:scalatra_2.12:2.6.3'
+    compile "ch.qos.logback:logback-classic:1.2.3"
+    compile 'org.eclipse.jetty:jetty-webapp:9.4.9.v20180320'
+    //provided 'javax.servlet:javax.servlet-api:3.1.0'
 }
 
 jar {
