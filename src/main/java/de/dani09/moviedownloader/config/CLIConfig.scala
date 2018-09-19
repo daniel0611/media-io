@@ -8,7 +8,8 @@ import scala.io.Source
 case class CLIConfig(
                       configPath: Path = null,
                       interactive: Boolean = false,
-                      serveWebFrontend: Boolean = false
+                      serveWebFrontend: Boolean = false,
+                      serverPort: Int = 80
                     )
 
 object CLIConfig {
@@ -26,12 +27,17 @@ object CLIConfig {
 
       opt[Unit]('i', "interactive")
         .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies")
-        .action((v, c) => c.copy(interactive = true))
+        .action((_, c) => c.copy(interactive = true))
 
-      opt[Unit]('s', "serve")
-        .action((v, c) => c.copy(serveWebFrontend = true))
-        .text("Serve the WebFrontend to watch the downloaded Movies in the Browser\n\t\t" +
-          "       Will open the Http server on port 80 or the Environment variable \"PORT\" if set")
+      cmd("serve")
+        .text("Serve the WebFrontend to watch the downloaded Movies in the Browser")
+        .action((_, c) => c.copy(serveWebFrontend = true))
+        .children(
+          opt[Int]('p', "port")
+            .text("Sets the Port that the Server should run on. Default is 80")
+            .action((v, c) => c.copy(serverPort = v))
+            .validate(v => if ((1 to 65535).contains(v)) success else failure("Port is not valid! must be between 1 and 65535"))
+        )
 
       checkConfig(c =>
         if (c.serveWebFrontend && c.interactive) failure("Cannot start interactive Mode and serve the WebFrontend at the same Time!")

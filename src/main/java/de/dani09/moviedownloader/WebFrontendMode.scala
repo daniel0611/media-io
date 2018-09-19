@@ -6,12 +6,13 @@ import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.ScalatraServlet
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.LoggerFactory
 
 object WebFrontendMode {
   def start(config: Config, cli: CLIConfig): Unit = {
     println("Starting interactive mode!")
 
-    val port = if (System.getenv("PORT") != null) System.getenv("PORT").toInt else 80
+    val port = cli.serverPort
 
     val server = new Server(port)
     val context = new WebAppContext()
@@ -30,7 +31,11 @@ object WebFrontendMode {
 }
 
 class WebFrontendMode extends ScalatraServlet {
+
+  private val logger = LoggerFactory.getLogger(getClass)
+
   get("/") {
+    logger.info("Hello World")
     "Hello World"
   }
 }
