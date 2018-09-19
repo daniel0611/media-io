@@ -62,6 +62,6 @@ object CLIConfig {
     if (in != null)
       s"Version ${Source.fromInputStream(in).mkString}"
     else
-      "Version Dev"
+      "Dev Version"
   }
 }
