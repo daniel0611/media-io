@@ -9,7 +9,7 @@ case class CLIConfig(
                       configPath: Path = null,
                       interactive: Boolean = false,
                       serveWebFrontend: Boolean = false,
-                      serverPort: Int = 80
+                      serverPort: Int = 8080
                     )
 
 object CLIConfig {
