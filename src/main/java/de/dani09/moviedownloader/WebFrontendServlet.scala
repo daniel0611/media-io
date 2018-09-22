@@ -1,14 +1,14 @@
 package de.dani09.moviedownloader
 
+import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.scalatra.ScalatraServlet
 import org.slf4j.LoggerFactory
 
-class WebFrontendServlet extends ScalatraServlet {
+class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  get("/api") {
-    logger.info("Hello World")
-    "Hello World"
+  get("/") {
+    s"Hello World\nDownloadDir: ${conf.downloadDirectory}"
   }
 }

@@ -19,6 +19,8 @@ object WebFrontendMode {
     context.addEventListener(new ScalatraListener)
     context.addServlet(classOf[DefaultServlet], "/")
 
+    ScalatraBootstrap.addServlet(new WebFrontendServlet(config, cli), "/api/*")
+
     server.setHandler(context)
 
     println(s"Starting server on port $port")

@@ -13,4 +13,9 @@
     <listener>
         <listener-class>org.scalatra.servlet.ScalatraListener</listener-class>
     </listener>
+
+    <context-param>
+        <param-name>org.scalatra.LifeCycle</param-name>
+        <param-value>de.dani09.moviedownloader.ScalatraBootstrap</param-value>
+    </context-param>
 </web-app>
