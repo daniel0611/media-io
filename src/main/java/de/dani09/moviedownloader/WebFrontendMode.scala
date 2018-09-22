@@ -2,7 +2,7 @@ package de.dani09.moviedownloader
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.servlet.{DefaultServlet, ServletHolder}
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
@@ -20,6 +20,7 @@ object WebFrontendMode {
     context.addServlet(classOf[DefaultServlet], "/")
 
     ScalatraBootstrap.addServlet(new WebFrontendServlet(config, cli), "/api/*")
+    context.addServlet(getMovieDirectoryServlet(config), "/data/*")
 
     server.setHandler(context)
 
@@ -27,5 +28,13 @@ object WebFrontendMode {
 
     server.start()
     server.join()
+  }
+
+  def getMovieDirectoryServlet(config: Config): ServletHolder = {
+    val s = new DefaultServlet()
+    val h = new ServletHolder(s)
+    h.setInitParameter("resourceBase", config.downloadDirectory.toString)
+    h.setInitParameter("pathInfoOnly", "true")
+    h
   }
 }
