@@ -6,6 +6,7 @@ import java.nio.file.{Files, Path}
 
 import de.dani09.http.Http
 import de.dani09.moviedownloader.config.Config
+import de.dani09.moviedownloader.data.{DatenFilmToMovieConverter, HttpListener2ProgressBar, Movie}
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -14,7 +15,7 @@ import me.tongfei.progressbar.{ProgressBarBuilder, ProgressBarStyle}
 import scala.collection.JavaConverters._
 import scala.collection.parallel.ParSeq
 
-class MovieDownloader(config: Config) {
+class MovieDownloaderUtil(config: Config) {
 
   def saveMovieData(destination: Path, downloadUrl: URL): Unit = downloadFile(destination, downloadUrl, "Movie Data")
 

@@ -3,7 +3,7 @@ package de.dani09.moviedownloader.config
 import java.io.{File, FileWriter}
 import java.nio.file.Paths
 
-import de.dani09.moviedownloader.Movie
+import de.dani09.moviedownloader.data.Movie
 import org.json.{JSONArray, JSONException}
 
 import scala.collection.mutable.ListBuffer

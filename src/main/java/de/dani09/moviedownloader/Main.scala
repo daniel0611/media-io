@@ -4,6 +4,7 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
+import de.dani09.moviedownloader.data.Movie
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
@@ -52,7 +53,7 @@ object Main {
   def downloadMovies(config: Config): Unit = {
     val downloadedMovies = DownloadedMovies.deserialize(config)
 
-    val downloader = new MovieDownloader(config)
+    val downloader = new MovieDownloaderUtil(config)
     saveMovieData(downloader = downloader, source = config.movieDataSource)
 
     var movies: ParSeq[Movie] = getMovies(downloader)
@@ -89,7 +90,7 @@ object Main {
   }
 
   def saveMovieData(path: Path = getMovieListTmpPath,
-                    downloader: MovieDownloader = new MovieDownloader(null),
+                    downloader: MovieDownloaderUtil = new MovieDownloaderUtil(null),
                     source: URL): Unit = {
     downloader.saveMovieData(getMovieListTmpPath, source)
   }
@@ -100,7 +101,7 @@ object Main {
     Paths.get(tmp, movieListFileName)
   }
 
-  def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
+  def getMovies(downloader: MovieDownloaderUtil, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
     println("Reading Movie Data")
     val movies = downloader.getMovieList(path)
     println("Parsed Movie Data successfully")

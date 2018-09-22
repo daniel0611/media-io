@@ -1,10 +1,10 @@
-package de.dani09.moviedownloader
+package de.dani09.moviedownloader.data
 
 import de.dani09.http.HttpProgressListener
 import me.tongfei.progressbar.{ProgressBar, ProgressBarBuilder}
 
 class HttpListener2ProgressBar(pbb: ProgressBarBuilder) extends HttpProgressListener {
-  var pb: ProgressBar = null
+  var pb: ProgressBar = _
 
   override def onStart(l: Long): Unit = {
     pb = pbb.
