@@ -37,7 +37,7 @@ object Main {
     }
 
     if (config == null) {
-      println("Config file does not exist!")
+      println(s"No Config file found at ${cliConf.configPath}")
       System.exit(1)
     }
 
