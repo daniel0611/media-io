@@ -18,16 +18,19 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   def serialize(config: Config): Unit = {
     val file = DownloadedMovies.getDownloadedMoviesFile(config)
 
-    val jsonString = movies
-      .groupBy(_.downloadUrl) // this...
-      .map(_._2.head) // ... and this filters duplicates with the same download url
-      .map(_.toJson)
-      .foldLeft(new JSONArray())((arr, x) => arr.put(x))
-      .toString
+    val jsonString = this.toJson.toString
 
     val fw = new FileWriter(file)
     fw.write(jsonString)
     fw.close()
+  }
+
+  def toJson: JSONArray = {
+    movies
+      .groupBy(_.downloadUrl) // this...
+      .map(_._2.head) // ... and this filters duplicates with the same download url
+      .map(_.toJson)
+      .foldLeft(new JSONArray())((arr, x) => arr.put(x))
   }
 
   def addMovie(m: Movie): Unit = movies += m
