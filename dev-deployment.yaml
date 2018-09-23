@@ -1,0 +1,123 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: movie-downloader-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: movie-downloader-config
+data:
+  config.json: |
+    {
+      "downloadDirectory": "/data/",
+      "minimumSize": 0,
+      "minimumLength": 20,
+      "maxDaysOld": 0,
+      "filters": [
+        {
+          "tvChannel": "zdf",
+          "seriesTitle": "Der Bergdoktor"
+        }
+      ]
+    }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-downloader-deploy
+  labels:
+    app: movie-downloader
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-downloader
+  template:
+    metadata:
+      labels:
+        app: movie-downloader
+    spec:
+      containers:
+      - name: movie-downloader
+        image: dani09/movie-downloader-dev
+        imagePullPolicy: Always
+        args: ["serve"]
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config.json
+          subPath: config.json
+        ports:
+        - containerPort: 8080
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: movie-downloader-pvc
+          readOnly: true
+      - name: config
+        configMap:
+          name: movie-downloader-config
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: movie-downloader-svc
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: movie-downloader
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: movie-downloader-dl
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: movie-downloader
+            image: dani09/movie-downloader-dev
+            volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config.json
+              subPath: config.json
+            imagePullPolicy: Always
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: movie-downloader-pvc
+          - name: config
+            configMap:
+              name: movie-downloader-config
+          restartPolicy: OnFailure
+

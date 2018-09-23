@@ -1,0 +1,29 @@
+apiVersion: skaffold/v1alpha2
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+
+  artifacts:
+  - imageName: dani09/movie-downloader-dev
+    workspace: .
+
+    docker:
+      dockerfilePath: Dockerfile
+
+  local:
+    skipPush: false
+  #   useDockerCLI: false
+  #   useBuildkit: false
+
+deploy:
+  kubectl:
+    manifests:
+    - dev-deployment.yaml
+
+# profiles section has all the profile information which can be used to override any build or deploy configuration
+#profiles:
+#- name: gcb
+#  build:
+#    googleCloudBuild:
+#      projectId: k8s-skaffold
