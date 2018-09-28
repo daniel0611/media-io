@@ -79,15 +79,16 @@ class MovieDownloaderUtil(config: Config) {
 
       println(s"Downloading $taskName")
 
-      val pbb = new ProgressBarBuilder()
+      val listener = new ProgressBarBuilder()
         .setStyle(ProgressBarStyle.ASCII)
         .setUnit("MB", 1048576)
         .setUpdateIntervalMillis(1000)
         .showSpeed()
+        .toHttpProgressListener
 
       Http.get(downloadUrl.toString)
         .setOutputStream(out)
-        .addProgressListener(pbb.toHttpProgressListener)
+        .addProgressListener(listener)
         .handleRedirects(10)
         .execute()
 
