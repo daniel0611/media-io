@@ -6,10 +6,16 @@ COPY build.gradle /build/
 COPY settings.gradle /build/
 RUN mkdir /cache
 
-RUN gradle classes --no-daemon -g /cache
+# Create a Scala file to download all compile dependencies
+RUN mkdir /build/src/ && mkdir /build/src/main && \
+    mkdir /build/src/main/java && echo "object Main{}" > /build/src/main/java/Main.scala
+
+# download deps to be cached with the Docker cache
+RUN gradle classes compileScala --no-daemon -g /cache --debug
 
 COPY src /build/src
 
+# actual compiling
 RUN gradle build jar --no-daemon --parallel -g /cache
 RUN cp /build/build/libs/*.jar /build/app.jar
 

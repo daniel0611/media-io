@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1alpha2
+apiVersion: skaffold/v1alpha3
 kind: Config
 build:
   tagPolicy:
@@ -8,13 +8,13 @@ build:
   - imageName: dani09/movie-downloader-dev
     workspace: .
 
-    docker:
-      dockerfilePath: Dockerfile
+    #docker:
+    #  dockerfilePath: Dockerfile
 
   local:
     skipPush: false
-  #   useDockerCLI: false
-  #   useBuildkit: false
+    #useDockerCLI: true
+    #useBuildkit: true
 
 deploy:
   kubectl:

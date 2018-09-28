@@ -66,6 +66,8 @@ object Main {
     movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))
     println(s"${movies.length} not already downloaded")
 
+    System.gc()
+
     if (movies.nonEmpty) {
       println(s"Will download ${movies.length} Movies:")
       movies.foreach(m => println(s"${m.tvChannel} --> ${m.seriesTitle} --> ${m.episodeTitle}"))
