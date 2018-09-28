@@ -6,7 +6,9 @@ import java.nio.file.{Files, Path}
 
 import de.dani09.http.Http
 import de.dani09.moviedownloader.config.Config
-import de.dani09.moviedownloader.data.{DatenFilmToMovieConverter, HttpListener2ProgressBar, Movie}
+import de.dani09.moviedownloader.data.DatenFilmToMovieConverter._
+import de.dani09.moviedownloader.data.Movie
+import de.dani09.moviedownloader.data.ProgressBarBuilder2HttpProgressListener._
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -51,7 +53,7 @@ class MovieDownloaderUtil(config: Config) {
     // Convert from "DatenFilm" to Movie
     filme.asScala
       .par
-      .map(m => DatenFilmToMovieConverter.convert(m))
+      .map(m => m.toMovie)
       .filter(_ != null)
   }
 
@@ -85,7 +87,7 @@ class MovieDownloaderUtil(config: Config) {
 
       Http.get(downloadUrl.toString)
         .setOutputStream(out)
-        .addProgressListener(new HttpListener2ProgressBar(pbb))
+        .addProgressListener(pbb.toHttpProgressListener)
         .handleRedirects(10)
         .execute()
 

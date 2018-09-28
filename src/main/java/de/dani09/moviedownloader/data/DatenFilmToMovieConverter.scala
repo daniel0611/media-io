@@ -5,10 +5,12 @@ import java.text.{ParseException, SimpleDateFormat}
 
 import de.mediathekview.mlib.daten.DatenFilm
 
+import scala.language.implicitConversions
+
 //noinspection SpellCheckingInspection
-object DatenFilmToMovieConverter {
-  def convert(data: DatenFilm): Movie = {
-    val arr = proccessArray(data.arr)
+class DatenFilmToMovieConverter(mov: DatenFilm) {
+  def toMovie: Movie = {
+    val arr = proccessArray(mov.arr)
     if (arr.size < 8) {
       return null
     }
@@ -20,14 +22,14 @@ object DatenFilmToMovieConverter {
       val releaseDate = releaseDateParser.parse(s"$releaseTimeString $releaseDateString")
 
       new Movie(
-        downloadUrl = new URL(data.getUrl),
+        downloadUrl = new URL(mov.getUrl),
         tvChannel = arr.head,
         seriesTitle = arr(1),
         episodeTitle = arr(2),
         releaseDate = releaseDate,
         description = arr(7),
-        lengthInMinutes = data.dauerL / 60,
-        sizeInMb = data.dateigroesseL.l.toInt
+        lengthInMinutes = mov.dauerL / 60,
+        sizeInMb = mov.dateigroesseL.l.toInt
       )
     } catch {
       case _: ParseException => null
@@ -54,4 +56,9 @@ object DatenFilmToMovieConverter {
       case _: Throwable => false
     }
   }
+}
+
+//noinspection SpellCheckingInspection
+object DatenFilmToMovieConverter {
+  implicit def datenFilm2DatenFilmToMovieConverter(value: DatenFilm): DatenFilmToMovieConverter = new DatenFilmToMovieConverter(value)
 }
