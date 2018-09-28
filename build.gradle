@@ -25,7 +25,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'de.mediathekview:MLib:3.0.2'
-    implementation 'org.scala-lang:scala-library:2.12.6'
+    implementation 'org.scala-lang:scala-library:2.12.7'
     implementation 'org.json:json:20180813'
     implementation 'me.tongfei:progressbar:0.7.1'
     implementation 'com.github.scopt:scopt_2.12:3.7.0'
