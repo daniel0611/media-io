@@ -22,22 +22,22 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movie-downloader-deploy
+  name: movie-downloader-api
   labels:
-    app: movie-downloader
+    app: movie-downloader-api
 spec:
   revisionHistoryLimit: 2
   replicas: 1
   selector:
     matchLabels:
-      app: movie-downloader
+      app: movie-downloader-api
   template:
     metadata:
       labels:
-        app: movie-downloader
+        app: movie-downloader-api
     spec:
       containers:
-      - name: movie-downloader
+      - name: movie-downloader-api
         image: dani09/movie-downloader-dev
         imagePullPolicy: Always
         args: ["serve"]
@@ -73,15 +73,77 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: movie-downloader-svc
+  name: movie-downloader-api-svc
 spec:
   sessionAffinity: ClientIP
   selector:
-    app: movie-downloader
+    app: movie-downloader-api
   ports:
   - protocol: "TCP"
-    port: 8080
+    name: api
+    port: 80
     targetPort: 8080
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-downloader-serve
+  labels:
+    app: movie-downloader-serve
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-downloader-serve
+  template:
+    metadata:
+      labels:
+        app: movie-downloader-serve
+    spec:
+      containers:
+      - name: nginx
+        image: dani09/movie-downloader-dev-nginx
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        ports:
+        - containerPort: 8090
+        readinessProbe:
+          httpGet:
+            port: 8090
+            path: /health
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            port: 8090
+            path: /health
+          periodSeconds: 10
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: movie-downloader-pvc
+          readOnly: true
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: movie-downloader-serve-svc
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: movie-downloader-serve
+  ports:
+  - protocol: "TCP"
+    name: serve
+    port: 80
+    targetPort: 8090
   type: LoadBalancer
 
 ---
