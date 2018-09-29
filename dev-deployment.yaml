@@ -49,6 +49,16 @@ spec:
           subPath: config.json
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /health
+          periodSeconds: 10
       volumes:
       - name: data
         persistentVolumeClaim:
