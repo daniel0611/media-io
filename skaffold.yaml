@@ -7,11 +7,13 @@ build:
   artifacts:
   - imageName: dani09/movie-downloader-dev
     workspace: .
+    docker:
+      dockerfilePath: k8s/Dockerfiles/Dockerfile
 
   - imageName: dani09/movie-downloader-dev-nginx
     workspace: .
     docker:
-      dockerfilePath: nginx.Dockerfile
+      dockerfilePath: k8s/Dockerfiles/nginx.Dockerfile
 
   local:
     skipPush: false
@@ -21,8 +23,8 @@ build:
 deploy:
   kubectl:
     manifests:
-    - dev-deployment.yaml
-    - dev-deployment-ing.yaml
+    - k8s/manifests/dev-deployment.yaml
+    - k8s/manifests/dev-deployment-ing.yaml
 
 # profiles section has all the profile information which can be used to override any build or deploy configuration
 #profiles:
