@@ -5,6 +5,7 @@ import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
 import de.dani09.moviedownloader.data.Movie
+import de.dani09.moviedownloader.web.WebFrontendMode
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq

@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader
+package de.dani09.moviedownloader.web
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
 import org.scalatra.ScalatraServlet

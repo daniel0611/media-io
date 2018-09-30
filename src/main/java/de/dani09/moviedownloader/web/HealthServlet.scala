@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader
+package de.dani09.moviedownloader.web
 
 import org.scalatra.ScalatraServlet
 

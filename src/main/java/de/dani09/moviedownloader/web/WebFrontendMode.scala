@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader
+package de.dani09.moviedownloader.web
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.eclipse.jetty.server.Server
