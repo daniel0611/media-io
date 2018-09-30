@@ -7,6 +7,10 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
 object WebFrontendMode {
+
+  /**
+    * starts the WebFrontendMode with the Api and Data Servlet
+    */
   def start(config: Config, cli: CLIConfig): Unit = {
     println("Entering Web Frontend Mode!")
 
@@ -31,7 +35,13 @@ object WebFrontendMode {
     server.join()
   }
 
-  def getMovieDirectoryServlet(config: Config): ServletHolder = {
+  /**
+    * creates an Servlet that serves the DownloadDirectory
+    *
+    * @param config the Config is used to get the DownloadDirectory Path
+    * @return returns the created Servlet
+    */
+  private def getMovieDirectoryServlet(config: Config): ServletHolder = {
     val s = new DefaultServlet()
     val h = new ServletHolder(s)
     h.setInitParameter("resourceBase", config.downloadDirectory.toString)

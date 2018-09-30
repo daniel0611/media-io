@@ -5,10 +5,13 @@ import org.scalatra._
 
 import scala.collection.mutable.ListBuffer
 
+/**
+  * ScalatraBootstrap mounts Servlets for Scalatra
+  */
 class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {
-    for ((s, p) <- ScalatraBootstrap.servlets) {
-      context.mount(s, p)
+    for ((servlet, url) <- ScalatraBootstrap.servlets) {
+      context.mount(servlet, url)
     }
   }
 }
@@ -16,5 +19,11 @@ class ScalatraBootstrap extends LifeCycle {
 object ScalatraBootstrap {
   private val servlets = ListBuffer[(ScalatraServlet, String)]()
 
+  /**
+    * adds an servlet that will be mounted once Scalatra starts
+    *
+    * @param servlet    the Servlet you want to mount
+    * @param urlPattern the UrlPattern on which the Servlet should be mounted on
+    */
   def addServlet(servlet: ScalatraServlet, urlPattern: String): Unit = servlets += ((servlet, urlPattern))
 }

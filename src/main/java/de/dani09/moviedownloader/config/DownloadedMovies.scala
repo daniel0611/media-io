@@ -39,7 +39,7 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
     movies
       .groupBy(_.downloadUrl) // this...
       .map(_._2.head) // ... and this filters duplicates with the same download url
-      .map(_.toJson) // List[Movie] -> List[JSONObject]
+      .map(_.toJson) // convert Movies to json // List[Movie] -> List[JSONObject]
       .foldLeft(new JSONArray())((arr, x) => arr.put(x)) // put JSONObjects into JSONArray // List[JSONObject] -> JSONArray
   }
 
