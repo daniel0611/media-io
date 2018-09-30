@@ -8,7 +8,7 @@ import org.scalatra.servlet.ScalatraListener
 
 object WebFrontendMode {
   def start(config: Config, cli: CLIConfig): Unit = {
-    println("Starting interactive mode!")
+    println("Entering Web Frontend Mode!")
 
     val port = cli.serverPort
 
