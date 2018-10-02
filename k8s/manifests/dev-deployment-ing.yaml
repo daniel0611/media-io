@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: movie-downloader-api-ing
+  name: movie-downloader-ing
 spec:
   rules:
   - http:

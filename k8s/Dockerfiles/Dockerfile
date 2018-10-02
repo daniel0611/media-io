@@ -1,4 +1,4 @@
-FROM gradle:4.10.1-jdk8-alpine as build
+FROM gradle:4.10.1-jdk8-alpine as dep-cache
 USER root
 
 WORKDIR /build
@@ -13,7 +13,15 @@ RUN mkdir /build/src/ && mkdir /build/src/main && \
 # download deps to be cached with the Docker cache
 RUN gradle classes compileScala --no-daemon -g /cache --debug
 
-COPY src /build/src
+
+
+FROM gradle:4.10.1-jdk8-alpine as build
+USER root
+WORKDIR /build
+
+COPY --from=dep-cache /cache /cache
+
+COPY . /build
 
 # actual compiling
 RUN gradle build jar --no-daemon --parallel -g /cache
