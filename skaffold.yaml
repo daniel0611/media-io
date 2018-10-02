@@ -25,10 +25,3 @@ deploy:
     manifests:
     - k8s/manifests/dev-deployment.yaml
     - k8s/manifests/dev-deployment-ing.yaml
-
-# profiles section has all the profile information which can be used to override any build or deploy configuration
-#profiles:
-#- name: gcb
-#  build:
-#    googleCloudBuild:
-#      projectId: k8s-skaffold
