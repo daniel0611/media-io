@@ -10,17 +10,20 @@ import org.slf4j.LoggerFactory
 class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
   private val logger = LoggerFactory.getLogger(getClass)
+  private implicit val servlet: ScalatraServlet = this
 
   get("/getMovies") {
     val movies = DownloadedMovies
       .deserialize(conf)
       .getMovies
-      .map(m => m.copy(downloadUrl = getMovieUrl(m)))
+      .map(m => m.copy(downloadUrl = WebFrontendServlet.getMovieUrl(m)))
 
     new DownloadedMovies(movies).toJson
   }
+}
 
-  def getMovieUrl(m: Movie): URL = {
+object WebFrontendServlet {
+  private def getMovieUrl(m: Movie)(implicit servlet: ScalatraServlet): URL = {
     val path = m.getRelativeSavePath.toString
 
     val encoded = path
@@ -29,6 +32,6 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
       .map(_.replaceAll("\\+", "%20"))
       .reduceLeft((a, b) => a + "/" + b)
 
-    new URL(fullUrl("/data/" + encoded, includeServletPath = false))
+    new URL(servlet.fullUrl("/data/" + encoded, includeServletPath = false)(servlet.request, servlet.response))
   }
 }
