@@ -26,6 +26,20 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
     new DownloadedMovies(movies).toJson
   }
 
+  get("/getOverView") {
+    // FIXME document this and make it easier to understand!!!!!!!
+    DownloadedMovies
+      .deserialize(conf).withLocalDownloadUrls
+      .getMovies
+      .groupBy(_.tvChannel)
+      .mapValues(_.groupBy(_.seriesTitle))
+      .mapValues(_.mapValues(_.map(_.toJson)))
+      .mapValues(_.mapValues(_.foldLeft(new JSONArray())((arr, item) => arr.put(item))))
+      .mapValues(_.foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2)))
+      .foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2))
+      .toString
+  }
+
   get("/getTvChannels") {
     // TODO comment this
     DownloadedMovies
@@ -67,20 +81,6 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
         .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
         .toString
     }
-  }
-
-  get("/getOverView") {
-    // FIXME document this and make it easier to understand!!!!!!!
-    DownloadedMovies
-      .deserialize(conf).withLocalDownloadUrls
-      .getMovies
-      .groupBy(_.tvChannel)
-      .mapValues(_.groupBy(_.seriesTitle))
-      .mapValues(_.mapValues(_.map(_.toJson)))
-      .mapValues(_.mapValues(_.foldLeft(new JSONArray())((arr, item) => arr.put(item))))
-      .mapValues(_.foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2)))
-      .foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2))
-      .toString
   }
 }
 
