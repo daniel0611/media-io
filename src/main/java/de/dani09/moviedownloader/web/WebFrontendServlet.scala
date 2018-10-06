@@ -4,6 +4,7 @@ import java.net.{URL, URLEncoder}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
 import de.dani09.moviedownloader.data.Movie
+import de.dani09.moviedownloader.web.WebFrontendServlet.LocalDownloadedMovies
 import org.json.{JSONArray, JSONObject}
 import org.scalatra.ScalatraServlet
 import org.slf4j.LoggerFactory
@@ -19,9 +20,8 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
   get("/getMovies") {
     val movies = DownloadedMovies
-      .deserialize(conf)
+      .deserialize(conf).withLocalDownloadUrls
       .getMovies
-      .map(m => m.copy(downloadUrl = WebFrontendServlet.getMovieUrl(m)))
 
     new DownloadedMovies(movies).toJson
   }
@@ -29,7 +29,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
   get("/getTvChannels") {
     // TODO comment this
     DownloadedMovies
-      .deserialize(conf)
+      .deserialize(conf).withLocalDownloadUrls
       .getMovies
       .map(_.tvChannel)
       .map(_.toUpperCase)
@@ -44,7 +44,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
     val channel = params.getOrElse("tvChannel", "").toUpperCase()
 
     DownloadedMovies
-      .deserialize(conf)
+      .deserialize(conf).withLocalDownloadUrls
       .getMovies
       .filter(m => channel == "" | channel == m.tvChannel) // all if no channel was specified and otherwise check if channel is the same
       .map(_.toJson)
@@ -60,7 +60,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
       "Please specify a series"
     } else {
       DownloadedMovies
-        .deserialize(conf)
+        .deserialize(conf).withLocalDownloadUrls
         .getMovies
         .filter(_.seriesTitle.toLowerCase == series)
         .map(_.toJson)
@@ -72,7 +72,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
   get("/getOverView") {
     // FIXME document this and make it easier to understand!!!!!!!
     DownloadedMovies
-      .deserialize(conf)
+      .deserialize(conf).withLocalDownloadUrls
       .getMovies
       .groupBy(_.tvChannel)
       .mapValues(_.groupBy(_.seriesTitle))
@@ -85,15 +85,24 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 }
 
 object WebFrontendServlet {
-  private def getMovieUrl(m: Movie)(implicit servlet: ScalatraServlet): URL = {
-    val path = m.getRelativeSavePath.toString
 
-    val encoded = path
-      .split("/")
-      .map(u => URLEncoder.encode(u, "utf8"))
-      .map(_.replaceAll("\\+", "%20"))
-      .reduceLeft((a, b) => a + "/" + b)
+  private[web] implicit class LocalDownloadedMovies(dl: DownloadedMovies) {
+    def withLocalDownloadUrls(implicit servlet: ScalatraServlet): DownloadedMovies = {
+      val moviesWithCorrectUrl = dl
+        .getMovies
+        .map(m => m.copy(downloadUrl = getMovieUrl(m)))
 
-    new URL(servlet.fullUrl("/data/" + encoded, includeServletPath = false)(servlet.request, servlet.response))
+      new DownloadedMovies(moviesWithCorrectUrl)
+    }
+
+    private def getMovieUrl(m: Movie)(implicit servlet: ScalatraServlet): URL = {
+      val encoded = m.getRelativeSavePath.toString
+        .split("/") // do not encode slashes
+        .map(u => URLEncoder.encode(u, "utf8"))
+        .map(_.replaceAll("\\+", "%20")) // replace + with %20
+        .reduceLeft((a, b) => a + "/" + b) // put url back together
+
+      new URL(servlet.fullUrl("/data/" + encoded, includeServletPath = false)(servlet.request, servlet.response))
+    }
   }
 }
