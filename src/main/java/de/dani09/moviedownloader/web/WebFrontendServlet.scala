@@ -55,21 +55,27 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
   }
 
   get("/getSeries") {
-    val channel = params.getOrElse("tvChannel", "").toUpperCase()
+    val channel = params.getOrElse("channel", "").toUpperCase()
 
-    DownloadedMovies
-      .deserialize(conf).withLocalDownloadUrls
-      .getMovies
-      .filter(m => channel == "" | channel == m.tvChannel) // all if no channel was specified and otherwise check if channel is the same
-      .map(_.toJson)
-      .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
-      .toString
+    if (channel.isEmpty) {
+      status = 400
+      "Please specify a TvChannel"
+    } else {
+      DownloadedMovies
+        .deserialize(conf).withLocalDownloadUrls
+        .getMovies
+        .filter(m => channel == "" | channel == m.tvChannel) // all if no channel was specified and otherwise check if channel is the same
+        .map(_.seriesTitle)
+        .distinct
+        .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
+        .toString
+    }
   }
 
   get("/getEpisodes") {
     val series = params.getOrElse("series", "").toLowerCase
 
-    if (series == "") {
+    if (series.isEmpty) {
       status = 400
       "Please specify a series"
     } else {
@@ -105,4 +111,5 @@ object WebFrontendServlet {
       new URL(servlet.fullUrl("/data/" + encoded, includeServletPath = false)(servlet.request, servlet.response))
     }
   }
+
 }
