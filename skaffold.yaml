@@ -7,7 +7,7 @@ build:
     sync:
       'src/main/webapp/*': /src/main/webapp
     docker:
-      dockerfile: k8s/Dockerfiles/Dockerfile
+      dockerfile: k8s/Dockerfiles/dev.Dockerfile
   - image: dani09/movie-downloader-dev-nginx
     context: .
     docker:
