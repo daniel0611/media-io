@@ -1,0 +1,213 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: movie-downloader-config
+data:
+  config.json: |
+    {
+      "downloadDirectory": "/data/",
+      "minimumSize": 0,
+      "minimumLength": 20,
+      "maxDaysOld": 0,
+      "filters": [
+        {
+          "tvChannel": "zdf",
+          "seriesTitle": "Der Bergdoktor"
+        }
+      ]
+    }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-downloader-api
+  labels:
+    app: movie-downloader-api
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-downloader-api
+  template:
+    metadata:
+      labels:
+        app: movie-downloader-api
+    spec:
+      containers:
+      - name: movie-downloader-api
+        image: dani09/movie-downloader
+        imagePullPolicy: Always
+        args: ["serve"]
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config.json
+          subPath: config.json
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /health
+          periodSeconds: 10
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: movie-downloader-pvc
+          readOnly: true
+      - name: config
+        configMap:
+          name: movie-downloader-config
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: movie-downloader-api-svc
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: movie-downloader-api
+  ports:
+  - protocol: "TCP"
+    name: api
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-downloader-serve
+  labels:
+    app: movie-downloader-serve
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-downloader-serve
+  template:
+    metadata:
+      labels:
+        app: movie-downloader-serve
+    spec:
+      containers:
+      - name: nginx
+        image: dani09/movie-downloader:nginx
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        ports:
+        - containerPort: 8090
+        readinessProbe:
+          httpGet:
+            port: 8090
+            path: /health
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            port: 8090
+            path: /health
+          periodSeconds: 10
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: movie-downloader-pvc
+          readOnly: true
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: movie-downloader-serve-svc
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: movie-downloader-serve
+  ports:
+  - protocol: "TCP"
+    name: serve
+    port: 80
+    targetPort: 8090
+  type: LoadBalancer
+
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: movie-downloader-dl
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: movie-downloader
+            image: dani09/movie-downloader
+            volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config.json
+              subPath: config.json
+            imagePullPolicy: Always
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: movie-downloader-pvc
+          - name: config
+            configMap:
+              name: movie-downloader-config
+          restartPolicy: OnFailure
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: movie-downloader-ing
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: movie-downloader-api-svc
+          servicePort: api
+      - path: /data
+        backend:
+          serviceName: movie-downloader-serve-svc
+          servicePort: serve
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: movie-downloader-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Gi
