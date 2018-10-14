@@ -15,20 +15,19 @@ sourceSets.test.scala.srcDir "src/test/java"
 sourceSets.test.java.srcDirs = []
 
 repositories {
-    maven {
-        url "https://dl.bintray.com/dani09/ProgressBar"
-    }
-    mavenCentral()
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
     implementation 'org.scala-lang:scala-library:2.12.6'
 
+    implementation 'de.mediathekview:MLib:3.0.2'
+    implementation 'org.scala-lang:scala-library:2.12.7'
     implementation 'org.json:json:20180813'
     implementation 'de.mediathekview:MLib:3.0.2'
     implementation 'de.dani09:dani-http:0.4.1'
-    implementation 'me.tongfei:progressbar:0.7.1'
+    implementation 'me.tongfei:progressbar:0.7.2'
     implementation 'com.github.scopt:scopt_2.12:3.7.0'
 
     // scalatra
