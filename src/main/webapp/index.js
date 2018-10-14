@@ -1,10 +1,15 @@
 $(() => {
-    if (getChannel() === null)
+    const channel = getChannel();
+    const series = getSeries();
+
+    if (channel === null)
         loadChannels();
-    else if (getSeries() === null)
-        loadSeries(getChannel());
+    else if (series === null)
+        loadSeries(channel);
     else
-        loadEpisodes(getChannel(), getSeries());
+        loadEpisodes(channel, series);
+
+    initBackButton(channel, series)
 });
 
 function loadChannels() {
@@ -52,7 +57,7 @@ function loadEpisodes(channel, series) {
     })
 }
 
-
+// noinspection JSUnusedGlobalSymbols
 function setChannel(chan) {
     let url = window.location.href;
     if (url.indexOf('?') > -1) {
@@ -63,6 +68,7 @@ function setChannel(chan) {
     window.location.href = url;
 }
 
+// noinspection JSUnusedGlobalSymbols
 function setSeries(series) {
     let url = window.location.href;
     if (url.indexOf('?') > -1) {
@@ -73,6 +79,19 @@ function setSeries(series) {
     window.location.href = url;
 }
 
+function initBackButton(channel, series) {
+    if (channel !== null) {
+        // channel is set and therefore display back button
+        let href = "index.html";
+
+        console.log(location.hostname);
+        if (series !== null) {
+            href += "?channel=" + encodeURI(channel)
+        }
+
+        $('#back').append(`<a href="${href}">Go Back</a>`)
+    }
+}
 
 function getQueryParameters() {
     return new URLSearchParams(window.location.search);
