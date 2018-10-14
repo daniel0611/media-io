@@ -26,6 +26,8 @@ jobs:
     deploy:
       provider: script
       script: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin && docker push dani09/movie-downloader
+      on:
+        branch: master
 
 deploy:
   provider: releases
