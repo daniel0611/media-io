@@ -4,6 +4,8 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
+import de.dani09.moviedownloader.data.Movie
+import de.dani09.moviedownloader.web.WebFrontendMode
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
@@ -37,8 +39,13 @@ object Main {
     }
 
     if (config == null) {
-      println("Config file does not exist!")
+      println(s"No Config file found at ${cliConf.configPath}")
       System.exit(1)
+    }
+
+    if (cliConf.serveWebFrontend) {
+      WebFrontendMode.start(config, cliConf)
+      System.exit(0)
     }
 
     downloadMovies(config)
@@ -47,7 +54,7 @@ object Main {
   def downloadMovies(config: Config): Unit = {
     val downloadedMovies = DownloadedMovies.deserialize(config)
 
-    val downloader = new MovieDownloader(config)
+    val downloader = new MovieDownloaderUtil(config)
     saveMovieData(downloader = downloader, source = config.movieDataSource)
 
     var movies: ParSeq[Movie] = getMovies(downloader)
@@ -59,6 +66,8 @@ object Main {
 
     movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))
     println(s"${movies.length} not already downloaded")
+
+    System.gc()
 
     if (movies.nonEmpty) {
       println(s"Will download ${movies.length} Movies:")
@@ -84,7 +93,7 @@ object Main {
   }
 
   def saveMovieData(path: Path = getMovieListTmpPath,
-                    downloader: MovieDownloader = new MovieDownloader(null),
+                    downloader: MovieDownloaderUtil = new MovieDownloaderUtil(null),
                     source: URL): Unit = {
     downloader.saveMovieData(getMovieListTmpPath, source)
   }
@@ -95,7 +104,7 @@ object Main {
     Paths.get(tmp, movieListFileName)
   }
 
-  def getMovies(downloader: MovieDownloader, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
+  def getMovies(downloader: MovieDownloaderUtil, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
     println("Reading Movie Data")
     val movies = downloader.getMovieList(path)
     println("Parsed Movie Data successfully")

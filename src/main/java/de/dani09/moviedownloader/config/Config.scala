@@ -5,7 +5,7 @@ import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
-import de.dani09.moviedownloader.Movie
+import de.dani09.moviedownloader.data.Movie
 import org.json.JSONObject
 
 import scala.collection.JavaConverters._

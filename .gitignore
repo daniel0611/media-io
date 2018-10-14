@@ -1,6 +1,7 @@
-.idea
-build
-.gradle
+.idea/
+build/
+.gradle/
 MovieDownloader.iml
 config.json
 download
+out/

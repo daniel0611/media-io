@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader
+package de.dani09.moviedownloader.data
 
 import java.net.URL
 import java.nio.file.{Path, Paths}
@@ -7,15 +7,15 @@ import java.util.{Calendar, Date}
 import de.dani09.http.Http
 import org.json.JSONObject
 
-class Movie(val downloadUrl: URL,
-            val tvChannel: String,
-            val seriesTitle: String,
-            val episodeTitle: String,
-            val releaseDate: Date,
-            val description: String,
-            val lengthInMinutes: Long,
-            var sizeInMb: Int
-           ) {
+case class Movie(downloadUrl: URL,
+                 tvChannel: String,
+                 seriesTitle: String,
+                 episodeTitle: String,
+                 releaseDate: Date,
+                 description: String,
+                 lengthInMinutes: Long,
+                 var sizeInMb: Int
+                ) {
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
     println(s"DownloadUrl:\t$downloadUrl")
@@ -30,6 +30,10 @@ class Movie(val downloadUrl: URL,
   }
 
   def getSavePath(downloadDirectory: Path): Path = {
+    Paths.get(downloadDirectory.toString, getRelativeSavePath.toString)
+  }
+
+  def getRelativeSavePath: Path = {
     val calendar = Calendar.getInstance()
     calendar.setTime(releaseDate)
 
@@ -39,8 +43,7 @@ class Movie(val downloadUrl: URL,
     val title = seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
     val episode = episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
 
-    val pathString = s"$downloadDirectory/$tvChannel/$title/$episode-$dateString.$fileExtension"
-    Paths.get(pathString)
+    Paths.get(s"$tvChannel/$title/$episode-$dateString.$fileExtension")
   }
 
   private def getFileExtension(url: URL): String = url.getPath

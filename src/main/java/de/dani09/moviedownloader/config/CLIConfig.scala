@@ -7,7 +7,9 @@ import scala.io.Source
 
 case class CLIConfig(
                       configPath: Path = null,
-                      interactive: Boolean = false
+                      interactive: Boolean = false,
+                      serveWebFrontend: Boolean = false,
+                      serverPort: Int = 8080
                     )
 
 object CLIConfig {
@@ -17,15 +19,31 @@ object CLIConfig {
       head("MovieDownloader", getVersion)
 
       opt[File]('c', "config")
-        .valueName("<Path>")
+        .valueName("<path>")
         .text("Path to config file Default: ./config.json")
         .action((v, c) => c.copy(v.toPath))
         .required()
         .withFallback(() => new File("./config.json"))
 
       opt[Unit]('i', "interactive")
-        .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies")
-        .action((v, c) => c.copy(interactive = true))
+        .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies\n")
+        .action((_, c) => c.copy(interactive = true))
+
+      cmd("serve")
+        .valueName("<number>")
+        .text("Serve the WebFrontend to watch the downloaded Movies in the Browser")
+        .action((_, c) => c.copy(serveWebFrontend = true))
+        .children(
+          opt[Int]('p', "port")
+            .text("Sets the Port that the Server should run on. Default is 80\n")
+            .action((v, c) => c.copy(serverPort = v))
+            .validate(v => if ((1 to 65535).contains(v)) success else failure("Port is not valid! must be between 1 and 65535"))
+        )
+
+      checkConfig(c =>
+        if (c.serveWebFrontend && c.interactive) failure("Cannot start interactive Mode and serve the WebFrontend at the same Time!")
+        else success
+      )
 
       version("version").text("Displays the used Version")
       help("help").text("Displays this help page")
@@ -44,6 +62,6 @@ object CLIConfig {
     if (in != null)
       s"Version ${Source.fromInputStream(in).mkString}"
     else
-      "Version Dev"
+      "Dev Version"
   }
 }

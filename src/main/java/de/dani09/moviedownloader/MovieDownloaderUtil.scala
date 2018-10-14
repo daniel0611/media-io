@@ -6,6 +6,9 @@ import java.nio.file.{Files, Path}
 
 import de.dani09.http.Http
 import de.dani09.moviedownloader.config.Config
+import de.dani09.moviedownloader.data.DatenFilmToMovieConverter._
+import de.dani09.moviedownloader.data.Movie
+import de.dani09.moviedownloader.data.ProgressBarBuilder2HttpProgressListener._
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -14,7 +17,7 @@ import me.tongfei.progressbar.{ProgressBarBuilder, ProgressBarStyle}
 import scala.collection.JavaConverters._
 import scala.collection.parallel.ParSeq
 
-class MovieDownloader(config: Config) {
+class MovieDownloaderUtil(config: Config) {
 
   def saveMovieData(destination: Path, downloadUrl: URL): Unit = downloadFile(destination, downloadUrl, "Movie Data")
 
@@ -50,7 +53,7 @@ class MovieDownloader(config: Config) {
     // Convert from "DatenFilm" to Movie
     filme.asScala
       .par
-      .map(m => DatenFilmToMovieConverter.convert(m))
+      .map(m => m.toMovie)
       .filter(_ != null)
   }
 
@@ -76,15 +79,16 @@ class MovieDownloader(config: Config) {
 
       println(s"Downloading $taskName")
 
-      val pbb = new ProgressBarBuilder()
+      val listener = new ProgressBarBuilder()
         .setStyle(ProgressBarStyle.ASCII)
         .setUnit("MB", 1048576)
         .setUpdateIntervalMillis(1000)
         .showSpeed()
+        .toHttpProgressListener
 
       Http.get(downloadUrl.toString)
         .setOutputStream(out)
-        .addProgressListener(new HttpListener2ProgressBar(pbb))
+        .addProgressListener(listener)
         .handleRedirects(10)
         .execute()
 

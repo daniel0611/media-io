@@ -5,12 +5,13 @@ import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
 import de.dani09.moviedownloader.config.{Config, MovieFilter}
+import de.dani09.moviedownloader.data.Movie
 
 object InteractiveMode {
   def start(config: Config): Unit = {
     println("Entering interactive mode!")
     val s = new Scanner(System.in)
-    val dl = new MovieDownloader(new Config(getPath(config, s),
+    val dl = new MovieDownloaderUtil(new Config(getPath(config, s),
       minimumSize = 0, minimumLength = 0, maxDaysOld = 0,
       movieFilters = List[MovieFilter](), movieDataSource = getMovieDataSource(config)))
 
@@ -52,7 +53,7 @@ object InteractiveMode {
     }
   }
 
-  private def displayMovies(dl: MovieDownloader, s: Scanner, movies: List[Movie]): Unit = {
+  private def displayMovies(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie]): Unit = {
     if (movies.isEmpty) {
       println("Couldn't find any movies that matched this Filter")
       return
@@ -81,7 +82,7 @@ object InteractiveMode {
     }
   }
 
-  private def downloadMovie(dl: MovieDownloader, s: Scanner, movies: List[Movie]): Unit = {
+  private def downloadMovie(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie]): Unit = {
     println("Do you want to download one? (0 or empty String if no else id) ")
     val idString = s.nextLine()
 
