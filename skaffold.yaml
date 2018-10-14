@@ -1,24 +1,21 @@
-apiVersion: skaffold/v1alpha3
+apiVersion: skaffold/v1alpha4
 kind: Config
 build:
+  artifacts:
+  - image: dani09/movie-downloader-dev
+    context: .
+    sync:
+      'src/main/webapp/*': /src/main/webapp
+    docker:
+      dockerfile: k8s/Dockerfiles/Dockerfile
+  - image: dani09/movie-downloader-dev-nginx
+    context: .
+    docker:
+      dockerfile: k8s/Dockerfiles/nginx.Dockerfile
   tagPolicy:
     sha256: {}
-
-  artifacts:
-  - imageName: dani09/movie-downloader-dev
-    workspace: .
-    docker:
-      dockerfilePath: k8s/Dockerfiles/Dockerfile
-
-  - imageName: dani09/movie-downloader-dev-nginx
-    workspace: .
-    docker:
-      dockerfilePath: k8s/Dockerfiles/nginx.Dockerfile
-
   local:
-    skipPush: false
-    #useDockerCLI: true
-    #useBuildkit: true
+    push: true
 
 deploy:
   kubectl:
