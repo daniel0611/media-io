@@ -33,7 +33,7 @@ dependencies {
     // scalatra
     implementation  'org.scalatra:scalatra_2.12:2.6.3'
     compile "ch.qos.logback:logback-classic:1.2.3"
-    compile 'org.eclipse.jetty:jetty-webapp:9.4.9.v20180320'
+    compile 'org.eclipse.jetty:jetty-webapp:9.4.12.v20180830'
     //provided 'javax.servlet:javax.servlet-api:3.1.0'
 }
 
