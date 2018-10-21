@@ -16,7 +16,8 @@ class Config(
               val minimumLength: Long,
               val maxDaysOld: Int,
               val movieFilters: List[MovieFilter],
-              val movieDataSource: URL
+              val movieDataSource: URL,
+              val movieDataDiffSource: URL
             ) {
 
   def matchesMovie(movie: Movie): Boolean = {
@@ -60,7 +61,8 @@ object Config {
       minimumLength = configJson.optLong("minimumLength", 0),
       maxDaysOld = configJson.optInt("maxDaysOld", 0),
       movieFilters = filters,
-      movieDataSource = new URL(configJson.optString("movieDataSource", getMovieDataSourceDefaultValue))
+      movieDataSource = new URL(configJson.optString("movieDataSource", getMovieDataSourceDefaultValue)),
+      movieDataDiffSource = new URL(configJson.optString("movieDataSourceDiff", getMovieDataSourceDefaultValue))
     )
   }
 
@@ -71,4 +73,6 @@ object Config {
   )
 
   def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"
+
+  def getMovieDataDiffSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-diff.xz"
 }

@@ -4,18 +4,20 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
-import de.dani09.moviedownloader.config.{Config, MovieFilter}
+import de.dani09.moviedownloader.config.{CLIConfig, Config, MovieFilter}
 import de.dani09.moviedownloader.data.Movie
 
 object InteractiveMode {
-  def start(config: Config): Unit = {
+  def start(config: Config, cli: CLIConfig): Unit = {
     println("Entering interactive mode!")
     val s = new Scanner(System.in)
     val dl = new MovieDownloaderUtil(new Config(getPath(config, s),
       minimumSize = 0, minimumLength = 0, maxDaysOld = 0,
-      movieFilters = List[MovieFilter](), movieDataSource = getMovieDataSource(config)))
+      movieFilters = List[MovieFilter](),
+      movieDataSource = getMovieDataSource(config),
+      movieDataDiffSource = getMovieDataDiffSource(config)))
 
-    Main.saveMovieData(source = getMovieDataSource(config))
+    Main.saveMovieData(downloader = dl, diff = cli.diff)
     val movies = Main.getMovies(dl)
 
     while (true) {
@@ -39,6 +41,14 @@ object InteractiveMode {
       new URL(Config.getMovieDataSourceDefaultValue)
     } else {
       c.movieDataSource
+    }
+  }
+
+  private def getMovieDataDiffSource(c: Config): URL = {
+    if (c == null || c.movieDataDiffSource == null) {
+      new URL(Config.getMovieDataDiffSourceDefaultValue)
+    } else {
+      c.movieDataDiffSource
     }
   }
 

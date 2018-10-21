@@ -1,6 +1,5 @@
 package de.dani09.moviedownloader
 
-import java.net.URL
 import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
@@ -34,7 +33,7 @@ object Main {
       println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
 
     if (cliConf.interactive) {
-      InteractiveMode.start(config)
+      InteractiveMode.start(config, cliConf)
       System.exit(0)
     }
 
@@ -48,14 +47,14 @@ object Main {
       System.exit(0)
     }
 
-    downloadMovies(config)
+    downloadMovies(config, cliConf.diff)
   }
 
-  def downloadMovies(config: Config): Unit = {
+  def downloadMovies(config: Config, diff: Boolean): Unit = {
     val downloadedMovies = DownloadedMovies.deserialize(config)
 
     val downloader = new MovieDownloaderUtil(config)
-    saveMovieData(downloader = downloader, source = config.movieDataSource)
+    saveMovieData(downloader = downloader, diff = diff)
 
     var movies: ParSeq[Movie] = getMovies(downloader)
 
@@ -93,9 +92,9 @@ object Main {
   }
 
   def saveMovieData(path: Path = getMovieListTmpPath,
-                    downloader: MovieDownloaderUtil = new MovieDownloaderUtil(null),
-                    source: URL): Unit = {
-    downloader.saveMovieData(getMovieListTmpPath, source)
+                    downloader: MovieDownloaderUtil,
+                    diff: Boolean): Unit = {
+    downloader.saveMovieData(getMovieListTmpPath, diff)
   }
 
   def getMovieListTmpPath: Path = {
