@@ -19,7 +19,11 @@ import scala.collection.parallel.ParSeq
 
 class MovieDownloaderUtil(config: Config) {
 
-  def saveMovieData(destination: Path, downloadUrl: URL): Unit = downloadFile(destination, downloadUrl, "Movie Data")
+  def saveMovieData(destination: Path, diff: Boolean): Unit = {
+    val downloadUrl = if (diff) config.movieDataDiffSource else config.movieDataSource
+
+    downloadFile(destination, downloadUrl, "Movie Data")
+  }
 
   def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
     val path: Path = getMovieSavePath(movie)
