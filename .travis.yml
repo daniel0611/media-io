@@ -1,19 +1,18 @@
 language: scala
 jdk:
-- oraclejdk8
-- oraclejdk9
 - openjdk8
 - openjdk9
 
 scala:
-- 2.11.12
+- 2.11.11
 - 2.12.6
 
 jobs:
   include:
   - sudo: required
-    jdk: ""
     language: bash
+    jdk: ""
+    scala: []
     env:
     - DOCKER_USERNAME=dani09
     - secure: "n3p9E6MmjwzQJbzVT5Ztf71z/QWN6FPEUG61mWiXS2XxHGqU+FlehWZALivcuN5FzhvVTYhYt8k04xf8FFp2WMhARNSO92wTXCz7M5D7oPiAYS2WABYXYzzUmw+i37SYDKe9UR50blSjtWIgaTMGkc44wK8ECTsnRYpXzSbUhFSVPGJFh6hImsUFeIIWDKSJGluwmKL+BF5vf62WEWB6Ioyr35deGaftn8cmeCPsNxFJpUE2F320xSV5paNJHm2A8aW9foE0A2SLqvV5owubI6TRSkm3Z3fiTOVs6QslCOVrbpqPjW/c01tnggPsRi8E9XNnYCuoZGikzyFS1Xym3x5O7Jf0IbzJ7xpE1gunJJ5JliQYIWhcBosuyqqUTd3DNDuOq94jrvle+dJzA0OxMy3sFVZiJAQAhZBg7JAkI5efJTd4Sbt9nCUhdMAuVftiVidSHtvVuCnY1GwUAE/eaZUClILi9ryX20QEJc9nwyTPArgg//j0o6rfp9gDJ+q+tJpjK2M7kBmAtqrA41FTc1mYdo2hrAlog9BswoCnlh0ZNBsPS1eZhKCArnq3FRKMS0NRHO6lSSz95jcj9upnhfeZg9odVHJc2wUv/sH9z07P+YnCSwwo5+vAytkx8hGYPCMTr+4sYgNdJZ3pEh8I7FD6lmrM/IFZgfwR8RCEnqY="
