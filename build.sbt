@@ -1,3 +1,5 @@
+// TODO put version for scopt into jar
+
 name := "movie-downloader"
 organization := "de.dani09"
 
