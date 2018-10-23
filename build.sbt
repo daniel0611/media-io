@@ -5,7 +5,7 @@ organization := "de.dani09"
 
 version := "0.1"
 
-scalaVersion := "2.12.6"
+crossScalaVersions := Seq("2.11.11", "2.12.6")
 useJCenter := true
 resolvers += Classpaths.typesafeReleases
 
