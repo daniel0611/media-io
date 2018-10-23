@@ -1,7 +1,4 @@
 language: scala
-jdk:
-- openjdk8
-- openjdk9
 
 scala:
 - 2.11.11
@@ -22,7 +19,6 @@ jobs:
   include:
   - sudo: required
     language: bash
-    jdk: ""
     scala: []
     env:
     - DOCKER_USERNAME=dani09
