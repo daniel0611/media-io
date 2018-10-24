@@ -47,5 +47,5 @@ createVersionFile := {
 
 // let anything important depend on createVersionFile
 compile := ((compile in Compile) dependsOn createVersionFile).value
-run := ((run in Compile) dependsOn createVersionFile).value
+run := ((run in Compile) dependsOn createVersionFile).evaluated
 assembly := (assembly dependsOn createVersionFile).value
