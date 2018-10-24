@@ -1,5 +1,3 @@
-build
 .idea
-.gradle
-gradle
+target
 k8s/manifests
