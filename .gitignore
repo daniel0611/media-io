@@ -4,3 +4,4 @@ config.json
 download
 out/
 target
+src/main/resources/version.txt

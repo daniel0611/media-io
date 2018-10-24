@@ -1,4 +1,4 @@
-// TODO put version for scopt into jar
+import java.io.FileWriter
 
 name := "movie-downloader"
 organization := "de.dani09"
@@ -31,4 +31,21 @@ libraryDependencies ++= Seq(
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided;test" artifacts Artifact("javax.servlet-api", "jar", "jar")
 )
 
+lazy val createVersionFile = taskKey[Unit]("Creates a version file so the version is visible in --help")
+createVersionFile := {
+  val resourceDir = (resourceDirectory in Compile).value
 
+  val f = new File(resourceDir, "version.txt")
+  val writer = new FileWriter(f)
+
+  writer.write(version.value)
+  writer.flush()
+  writer.close()
+
+  println("Created version file")
+}
+
+// let anything important depend on createVersionFile
+compile := ((compile in Compile) dependsOn createVersionFile).value
+run := ((run in Compile) dependsOn createVersionFile).value
+assembly := (assembly dependsOn createVersionFile).value
