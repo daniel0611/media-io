@@ -4,7 +4,7 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config, MovieFilter}
+import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies, MovieFilter}
 import de.dani09.moviedownloader.data.Movie
 
 object InteractiveMode {
@@ -32,7 +32,7 @@ object InteractiveMode {
 
       println(s"${matchedMovies.length} Movies matched entered Filter!")
 
-      displayMovies(dl, s, matchedMovies)
+      displayMovies(dl, s, matchedMovies, config)
     }
   }
 
@@ -63,7 +63,7 @@ object InteractiveMode {
     }
   }
 
-  private def displayMovies(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie]): Unit = {
+  private def displayMovies(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie], config: Config): Unit = {
     if (movies.isEmpty) {
       println("Couldn't find any movies that matched this Filter")
       return
@@ -88,11 +88,11 @@ object InteractiveMode {
         m.printInfo()
       })
 
-      downloadMovie(dl, s, movies)
+      downloadMovie(dl, s, movies, config)
     }
   }
 
-  private def downloadMovie(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie]): Unit = {
+  private def downloadMovie(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie], config: Config): Unit = {
     println("Do you want to download one? (0 or empty String if no else id) ")
     val idString = s.nextLine()
 
@@ -101,12 +101,25 @@ object InteractiveMode {
       val id = idString.toInt
       val allowedRange = 1 to movies.length
 
-      if (allowedRange.contains(id))
-        dl.downloadMovie(movies(id - 1))
+      if (allowedRange.contains(id)) {
+        val movie = movies(id - 1)
+        dl.downloadMovie(movie)
+        saveMovieToDownloadedList(movie, config)
+      } else {
+        println("Unknown Id!")
+      }
     }
   }
 
-  def createMovieFilter(s: Scanner): MovieFilter = {
+  private def saveMovieToDownloadedList(movie: Movie, config: Config): Unit = {
+    val downloadList = DownloadedMovies.deserialize(config)
+
+    downloadList.addMovie(movie)
+
+    downloadList.serialize(config)
+  }
+
+  private def createMovieFilter(s: Scanner): MovieFilter = {
     println("Enter an TvChannel:")
     val channel = s.nextLine()
 
