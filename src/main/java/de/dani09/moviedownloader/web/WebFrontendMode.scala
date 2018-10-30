@@ -26,6 +26,7 @@ object WebFrontendMode {
     ScalatraBootstrap.addServlet(new WebFrontendServlet(config, cli), "/api/*")
     ScalatraBootstrap.addServlet(new HealthServlet, "/health/*")
     context.addServlet(getMovieDirectoryServlet(config), "/data/*")
+    context.addServlet(new ServletHolder(new RemoteConnectionServlet), "/ws/*")
 
     server.setHandler(context)
 
