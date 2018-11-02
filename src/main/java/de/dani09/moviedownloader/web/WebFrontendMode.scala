@@ -4,15 +4,19 @@ import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{DefaultServlet, ServletHolder}
 import org.eclipse.jetty.webapp.WebAppContext
+import org.scalatra.ScalatraServlet
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.LoggerFactory
 
 object WebFrontendMode {
+
+  private val logger = LoggerFactory.getLogger(getClass)
 
   /**
     * starts the WebFrontendMode with the Api and Data Servlet
     */
   def start(config: Config, cli: CLIConfig): Unit = {
-    println("Entering Web Frontend Mode!")
+    logger.info("Entering Web Frontend Mode!")
 
     val port = cli.serverPort
 
@@ -23,14 +27,14 @@ object WebFrontendMode {
     context.addEventListener(new ScalatraListener)
     context.addServlet(classOf[DefaultServlet], "/")
 
-    ScalatraBootstrap.addServlet(new WebFrontendServlet(config, cli), "/api/*")
-    ScalatraBootstrap.addServlet(new HealthServlet, "/health/*")
-    context.addServlet(getMovieDirectoryServlet(config), "/data/*")
-    context.addServlet(new ServletHolder(new RemoteConnectionServlet), "/ws/*")
+    mountScalatraServlet(new WebFrontendServlet(config, cli), "/api/*")
+    mountScalatraServlet(new HealthServlet, "/health/*")
+    mountJettyServlet(getMovieDirectoryServlet(config), "/data/*", context, "FileServerServlet")
+    mountJettyServlet(new ServletHolder(new RemoteConnectionServlet), "/ws/*", context, "RemoteConnectionServlet")
 
     server.setHandler(context)
 
-    println(s"Starting server on port $port")
+    logger.info(s"Starting server on port $port")
 
     server.start()
     server.join()
@@ -48,5 +52,29 @@ object WebFrontendMode {
     h.setInitParameter("resourceBase", config.downloadDirectory.toString)
     h.setInitParameter("pathInfoOnly", "true")
     h
+  }
+
+  /**
+    * Mounts the given Servlet on to the scalatra server and logs it to the console
+    *
+    * @param servlet the servlet which should be mounted
+    * @param path    on which path the servlet should listen
+    */
+  private def mountScalatraServlet(servlet: ScalatraServlet, path: String): Unit = {
+    logger.info(s"Mounting ${servlet.getClass.getName.split("\\.").last} at $path")
+    ScalatraBootstrap.addServlet(servlet, path)
+  }
+
+  /**
+    * Mounts the given Servlet on to the jetty context and logs it to the console
+    *
+    * @param servlet the servlet which should be mounted
+    * @param path    on which path the servlet should listen
+    * @param context the context on which the servlet will be mounted
+    * @param name    the name the servlet has. only for logging purposes
+    */
+  private def mountJettyServlet(servlet: ServletHolder, path: String, context: WebAppContext, name: String): Unit = {
+    logger.info(s"Mounting $name at $path")
+    context.addServlet(servlet, path)
   }
 }
