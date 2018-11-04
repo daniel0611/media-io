@@ -10,7 +10,8 @@ case class CLIConfig(
                       interactive: Boolean = false,
                       diff: Boolean = false,
                       serveWebFrontend: Boolean = false,
-                      serverPort: Int = 8080
+                      serverPort: Int = 8080,
+                      remoteServer: String = null
                     )
 
 object CLIConfig {
@@ -34,17 +35,24 @@ object CLIConfig {
         .text("Only download the MovieList with the newest Movies")
         .action((_, c) => c.copy(diff = true))
 
+      /*      opt[String]('r', "remote")
+              .valueName("<url>")
+              .text("Execute download actions on a remote Server")
+              .action((v, c) => c.copy(remoteServer = v))*/
+
       note("")
       cmd("serve")
-        .valueName("<number>")
         .text("Serve the WebFrontend to watch the downloaded Movies in the Browser")
         .action((_, c) => c.copy(serveWebFrontend = true))
         .children(
           opt[Int]('p', "port")
             .text("Sets the Port that the Server should run on. Default is 80")
             .action((v, c) => c.copy(serverPort = v))
-            .validate(v => if ((1 to 65535).contains(v)) success else failure("Port is not valid! must be between 1 and 65535"))
+            .validate(v => if ((1 to 65535).contains(v)) success else failure("Port is not valid! must be between 1 and 65535")),
 
+          opt[Unit]('r', "remote")
+            .text("Allow remote connection to this server to be able to download Movies remotly")
+            .action((_, c) => c.copy(remoteServer = "enabled"))
         )
       note("")
 
@@ -58,7 +66,9 @@ object CLIConfig {
     }
 
     parser.parse(args, new CLIConfig()) match {
-      case Some(value) => value
+      case Some(value) =>
+        println(value)
+        value
       case None =>
         System.exit(1)
         null
