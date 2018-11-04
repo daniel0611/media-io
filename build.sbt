@@ -42,7 +42,7 @@ createVersionFile := {
   writer.flush()
   writer.close()
 
-  println("Created version file")
+  streams.value.log.info("Created version file")
 }
 
 // let anything important depend on createVersionFile
