@@ -67,7 +67,6 @@ object CLIConfig {
 
     parser.parse(args, new CLIConfig()) match {
       case Some(value) =>
-        println(value)
         value
       case None =>
         System.exit(1)
