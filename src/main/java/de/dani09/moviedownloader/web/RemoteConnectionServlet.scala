@@ -1,7 +1,7 @@
 package de.dani09.moviedownloader.web
 
 import java.security.MessageDigest
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 
 import de.dani09.moviedownloader.data.Movie
 import de.dani09.moviedownloader.web.DownloadStatus._
@@ -95,16 +95,11 @@ object RemoteConnectionServlet {
 
       new JSONObject().put("text", text)
     }),
-    ("queueDownload", queueDownload)
+    ("queueDownload", queueDownload),
+    ("getJobStatus", jobStatus)
   )
   private var connectedSessions = Set[Session]()
   private var jobQueue = Queue[(String, Movie, DownloadStatus)]()
-
-  private def broadcast(text: String): Unit = {
-    connectedSessions
-      .map(_.getRemote.sendStringByFuture(text))
-      .foreach(_.get(1000, TimeUnit.MILLISECONDS))
-  }
 
   private def queueDownload(j: JSONObject): JSONObject = {
     val data = Option(j.getJSONObject("movie"))
@@ -114,10 +109,10 @@ object RemoteConnectionServlet {
         .put("message", "movie in json not found")
 
     val movie = Movie.fromJson(data.get)
-    val hash = sha256(data.get.toString).substring(0, 6)
+    val hash = sha256(data.get.toString).substring(0, 7)
 
     val job = (hash, movie, QUEUED)
-    jobQueue = jobQueue.enqueue(job)
+    jobQueue = jobQueue.enqueue(job).distinct
 
     new JSONObject()
       .put("status", "success")
@@ -125,6 +120,41 @@ object RemoteConnectionServlet {
       .put("place", jobQueue.length)
       .put("hash", hash)
   }
+
+  private def broadcast(text: String): Unit = {
+    connectedSessions
+      .map(_.getRemote.sendStringByFuture(text))
+      .foreach(_.get(1000, TimeUnit.MILLISECONDS))
+  }
+
+  private def jobStatus(j: JSONObject): JSONObject = {
+    val hash = j.optString("hash")
+    if (hash.isEmpty)
+      return new JSONObject()
+        .put("status", "error")
+        .put("message", "Hash not found in json")
+
+    if (hash.length != 7)
+      return new JSONObject()
+        .put("status", "error")
+        .put("message", "hash has the wrong length")
+
+    val job = jobQueue.find(_._1 == hash)
+    if (job.isEmpty)
+      return new JSONObject()
+        .put("status", "error")
+        .put("message", "Job not enqueued")
+
+    val json = new JSONObject()
+      .put("hash", job.get._1)
+      .put("movie", job.get._2.toJson)
+      .put("jobStatus", job.get._3.toString)
+
+    broadcast(json.put("status", "update"))
+    json.put("status", "success")
+  }
+
+  private def broadcast(json: JSONObject): Unit = broadcast(json.toString)
 
   private def sha256(s: String): String = {
     md.digest(s.getBytes)
