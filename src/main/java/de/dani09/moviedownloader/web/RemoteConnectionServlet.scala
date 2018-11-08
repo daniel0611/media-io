@@ -1,5 +1,6 @@
 package de.dani09.moviedownloader.web
 
+import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 
@@ -13,10 +14,10 @@ import org.json.{JSONException, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.Queue
+import scala.util.Random
 
-@WebSocket
+@WebSocket(maxIdleTime = 10000)
 class RemoteConnectionServlet extends WebSocketServlet {
-
   private val logger = LoggerFactory.getLogger(getClass)
 
   override def configure(webSocketServletFactory: WebSocketServletFactory): Unit = {
@@ -87,6 +88,8 @@ class RemoteConnectionServlet extends WebSocketServlet {
 }
 
 object RemoteConnectionServlet {
+  private val executor = new ScheduledThreadPoolExecutor(1)
+  private val logger = LoggerFactory.getLogger(getClass)
   private lazy val md = MessageDigest.getInstance("SHA-256")
   private val methods = List[(String, JSONObject => JSONObject)](
     ("helloWorld", j => {
@@ -100,6 +103,17 @@ object RemoteConnectionServlet {
   )
   private var connectedSessions = Set[Session]()
   private var jobQueue = Queue[(String, Movie, DownloadStatus)]()
+
+  startPinging()
+
+  private def startPinging(): Unit = {
+    logger.info("Pinging each connected Socket each 5 seconds")
+    executor.scheduleAtFixedRate(() => {
+      val data = Random.alphanumeric.take(10).mkString
+      val payload = ByteBuffer.wrap(data.getBytes)
+      connectedSessions.foreach(_.getRemote.sendPing(payload))
+    }, 2, 5, TimeUnit.SECONDS)
+  }
 
   private def queueDownload(j: JSONObject): JSONObject = {
     val data = Option(j.getJSONObject("movie"))
@@ -127,6 +141,8 @@ object RemoteConnectionServlet {
       .foreach(_.get(1000, TimeUnit.MILLISECONDS))
   }
 
+  private def broadcast(json: JSONObject): Unit = broadcast(json.toString)
+
   private def jobStatus(j: JSONObject): JSONObject = {
     val hash = j.optString("hash")
     if (hash.isEmpty)
@@ -153,8 +169,6 @@ object RemoteConnectionServlet {
     broadcast(json.put("status", "update"))
     json.put("status", "success")
   }
-
-  private def broadcast(json: JSONObject): Unit = broadcast(json.toString)
 
   private def sha256(s: String): String = {
     md.digest(s.getBytes)
