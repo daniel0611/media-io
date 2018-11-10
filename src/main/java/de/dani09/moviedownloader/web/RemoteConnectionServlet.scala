@@ -1,9 +1,13 @@
 package de.dani09.moviedownloader.web
 
+import java.io.{ByteArrayOutputStream, PrintStream}
 import java.nio.ByteBuffer
 import java.security.MessageDigest
-import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
 
+import de.dani09.http.HttpProgressListener
+import de.dani09.moviedownloader.MovieDownloaderUtil
+import de.dani09.moviedownloader.config.{Config, DownloadedMovies}
 import de.dani09.moviedownloader.data.Movie
 import de.dani09.moviedownloader.web.DownloadStatus._
 import de.dani09.moviedownloader.web.RemoteConnectionServlet._
@@ -14,6 +18,7 @@ import org.json.{JSONException, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.Queue
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.Random
 
 @WebSocket(maxIdleTime = 10000)
@@ -88,21 +93,18 @@ class RemoteConnectionServlet extends WebSocketServlet {
 }
 
 object RemoteConnectionServlet {
-  private val executor = new ScheduledThreadPoolExecutor(1)
+  private val jobExecutor = Executors.newFixedThreadPool(1)
+  private val pingExecutor = new ScheduledThreadPoolExecutor(1)
+  private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(jobExecutor)
+  var config: Config = _
   private val logger = LoggerFactory.getLogger(getClass)
   private lazy val md = MessageDigest.getInstance("SHA-256")
   private val methods = List[(String, JSONObject => JSONObject)](
-    ("helloWorld", j => {
-      val data = j.optString("data")
-      val text = if (data.nonEmpty) data else "Hello World"
-
-      new JSONObject().put("text", text)
-    }),
     ("queueDownload", queueDownload),
     ("getJobStatus", jobStatus)
   )
   private var connectedSessions = Set[Session]()
-  private var jobQueue = Queue[(String, Movie, DownloadStatus)]()
+  private var jobQueue = Queue[(String, Movie, DownloadStatus, Future[Unit])]()
 
   startPinging()
 
@@ -114,7 +116,7 @@ object RemoteConnectionServlet {
         connectedSessions.foreach(_.getRemote.sendPing(payload))
       }
     }
-    executor.scheduleAtFixedRate(run, 2, 5, TimeUnit.SECONDS)
+    pingExecutor.scheduleAtFixedRate(run, 2, 5, TimeUnit.SECONDS)
     logger.info("Pinging each connected Socket every 5 seconds")
   }
 
@@ -128,7 +130,7 @@ object RemoteConnectionServlet {
     val movie = Movie.fromJson(data.get)
     val hash = sha256(data.get.toString).substring(0, 7)
 
-    val job = (hash, movie, QUEUED)
+    val job = (hash, movie, QUEUED, getJobFuture(hash, config))
     jobQueue = jobQueue.enqueue(job).distinct
 
     logger.info(s"Download Job with hash $hash was enqueued")
@@ -175,6 +177,46 @@ object RemoteConnectionServlet {
 
     broadcast(json.put("status", "update"))
     json.put("status", "success")
+  }
+
+  private def getJobFuture(jobHash: String, config: Config): Future[Unit] = Future[Unit] {
+    val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
+    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
+    logger.info(s"Download Jobwith hash $jobHash started")
+
+    val mdu = new MovieDownloaderUtil(config, new PrintStream(new ByteArrayOutputStream()))
+    mdu.downloadMovie(job._2, new HttpProgressListener {
+      override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
+
+      override def onProgress(v: Double): Unit = {}
+
+      override def onProgress(done: Long, max: Long): Unit = broadcastJobStatus(job, done, max)
+
+      override def onFinish(): Unit = {}
+    })
+
+    val dm = DownloadedMovies.deserialize(config)
+    dm.addMovie(job._2)
+    dm.serialize(config)
+
+    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job.copy(_3 = FINISHED) else j)
+    logger.info(s"Download Job with hash $jobHash finished")
+    broadcastJobStatus(job.copy(_3 = FINISHED))
+  }
+
+  private def broadcastJobStatus(job: (String, Movie, DownloadStatus, Future[Unit]), progress: Long = 0, maxProgress: Long = 0): Unit = {
+    val base = new JSONObject()
+      .put("status", "update")
+      .put("hash", job._1)
+      .put("jobStatus", job._3.toString)
+
+    broadcast(
+      if (maxProgress == 0)
+        base
+      else
+        base.put("progress", progress)
+          .put("maxProgress", maxProgress)
+    )
   }
 
   private def sha256(s: String): String = {
