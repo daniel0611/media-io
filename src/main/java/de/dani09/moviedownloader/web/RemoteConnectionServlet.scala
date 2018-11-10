@@ -107,7 +107,7 @@ object RemoteConnectionServlet {
   startPinging()
 
   private def startPinging(): Unit = {
-    logger.info("Pinging each connected Socket each 5 seconds")
+    logger.info("Pinging each connected Socket every 5 seconds")
     executor.scheduleAtFixedRate(() => {
       val data = Random.alphanumeric.take(10).mkString
       val payload = ByteBuffer.wrap(data.getBytes)
@@ -127,6 +127,8 @@ object RemoteConnectionServlet {
 
     val job = (hash, movie, QUEUED)
     jobQueue = jobQueue.enqueue(job).distinct
+
+    logger.info(s"Download Job with hash $hash was enqueued")
 
     new JSONObject()
       .put("status", "success")
@@ -165,6 +167,8 @@ object RemoteConnectionServlet {
       .put("hash", job.get._1)
       .put("movie", job.get._2.toJson)
       .put("jobStatus", job.get._3.toString)
+
+    logger.info(s"Status of job with hash $hash has been requested and been broadcast")
 
     broadcast(json.put("status", "update"))
     json.put("status", "success")
