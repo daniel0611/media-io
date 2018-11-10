@@ -1,10 +1,10 @@
 package de.dani09.moviedownloader
 
-import java.io.{File, FileOutputStream}
+import java.io.{File, FileOutputStream, PrintStream}
 import java.net.URL
 import java.nio.file.{Files, Path}
 
-import de.dani09.http.Http
+import de.dani09.http.{Http, HttpProgressListener}
 import de.dani09.moviedownloader.config.Config
 import de.dani09.moviedownloader.data.DatenFilmToMovieConverter._
 import de.dani09.moviedownloader.data.Movie
@@ -19,9 +19,9 @@ import scala.collection.JavaConverters._
 import scala.collection.parallel.ParSeq
 import scala.io.Source
 
-class MovieDownloaderUtil(config: Config) {
+class MovieDownloaderUtil(config: Config, out: PrintStream = System.out) {
 
-  def saveMovieData(destination: Path, diff: Boolean): Unit = {
+  def saveMovieData(destination: Path, diff: Boolean, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     val downloadUrl = if (diff) config.movieDataDiffSource else config.movieDataSource
 
     downloadFile(destination, downloadUrl, "Movie Data")
@@ -43,7 +43,7 @@ class MovieDownloaderUtil(config: Config) {
       override def fertig(e: ListenerFilmeLadenEvent): Unit = {
         super.fertig(e)
         if (e.fehler)
-          println(e.text)
+          out.println(e.text)
         done = true
       }
     })
@@ -65,14 +65,14 @@ class MovieDownloaderUtil(config: Config) {
     movies ++ getIncludedMovies.par // add manually included Movies
   }
 
-  def downloadMovie(movie: Movie): Unit = {
+  def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     val destinationPath = getMovieSavePath(movie)
     val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
 
-    downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true)
+    downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
   }
 
-  def isFileUpToDate(file: File, url: URL): Boolean = {
+  private def isFileUpToDate(file: File, url: URL): Boolean = {
     try {
       val connection = url.openConnection()
       val fullSize = connection.getContentLengthLong
@@ -83,37 +83,39 @@ class MovieDownloaderUtil(config: Config) {
     }
   }
 
-  private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false): Unit = {
-    var out: FileOutputStream = null
+  private def getProgressBarHttpListener: HttpProgressListener = {
+    new ProgressBarBuilder()
+      .setStyle(ProgressBarStyle.ASCII)
+      .setUnit("MB", 1048576)
+      .setUpdateIntervalMillis(1000)
+      .showSpeed()
+      .toHttpProgressListener
+  }
+
+  private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
+    var outStream: FileOutputStream = null
     val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
     try {
       Files.createDirectories(destination.getParent)
       val file = new File(destination.toUri)
       if (isFileUpToDate(file, downloadUrl)) {
-        println(s"$taskName is already up-to-date")
+        out.println(s"$taskName is already up-to-date")
         return
       }
-      out = new FileOutputStream(file)
+      outStream = new FileOutputStream(file)
 
-      println(s"Downloading $taskName")
-
-      val listener = new ProgressBarBuilder()
-        .setStyle(ProgressBarStyle.ASCII)
-        .setUnit("MB", 1048576)
-        .setUpdateIntervalMillis(1000)
-        .showSpeed()
-        .toHttpProgressListener
+      out.println(s"Downloading $taskName")
 
       Http.get(downloadUrl.toString)
-        .setOutputStream(out)
+        .setOutputStream(outStream)
         .addProgressListener(listener)
         .handleRedirects(10)
         .execute()
 
     } finally {
-      if (out != null) {
-        out.close()
+      if (outStream != null) {
+        outStream.close()
       }
     }
   }
@@ -145,11 +147,11 @@ class MovieDownloaderUtil(config: Config) {
         .map(json => Movie.fromJson(json)) // parse to Movie
         .toList
 
-      println(s"Successfully parsed ${list.length} Movies from include.json")
+      out.println(s"Successfully parsed ${list.length} Movies from include.json")
       list
     } catch {
       case e: JSONException =>
-        println(s"Couldn't parse include.json: ${e.getMessage}")
+        out.println(s"Couldn't parse include.json: ${e.getMessage}")
         emptyList // also return an empty list if there is an parsing error
     }
   }
