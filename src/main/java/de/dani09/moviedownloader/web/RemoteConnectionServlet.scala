@@ -182,7 +182,7 @@ object RemoteConnectionServlet {
   private def getJobFuture(jobHash: String, config: Config): Future[Unit] = Future[Unit] {
     val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
     jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
-    logger.info(s"Download Jobwith hash $jobHash started")
+    logger.info(s"Download Job with hash $jobHash started")
 
     val mdu = new MovieDownloaderUtil(config, new PrintStream(new ByteArrayOutputStream()))
     mdu.downloadMovie(job._2, new HttpProgressListener {
