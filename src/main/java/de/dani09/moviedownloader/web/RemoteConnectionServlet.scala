@@ -107,12 +107,15 @@ object RemoteConnectionServlet {
   startPinging()
 
   private def startPinging(): Unit = {
+    val run = new Runnable {
+      override def run(): Unit = {
+        val data = Random.alphanumeric.take(10).mkString
+        val payload = ByteBuffer.wrap(data.getBytes)
+        connectedSessions.foreach(_.getRemote.sendPing(payload))
+      }
+    }
+    executor.scheduleAtFixedRate(run, 2, 5, TimeUnit.SECONDS)
     logger.info("Pinging each connected Socket every 5 seconds")
-    executor.scheduleAtFixedRate(() => {
-      val data = Random.alphanumeric.take(10).mkString
-      val payload = ByteBuffer.wrap(data.getBytes)
-      connectedSessions.foreach(_.getRemote.sendPing(payload))
-    }, 2, 5, TimeUnit.SECONDS)
   }
 
   private def queueDownload(j: JSONObject): JSONObject = {
