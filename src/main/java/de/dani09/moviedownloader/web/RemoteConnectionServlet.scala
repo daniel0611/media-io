@@ -96,7 +96,7 @@ object RemoteConnectionServlet {
   private val jobExecutor = Executors.newFixedThreadPool(1)
   private val pingExecutor = new ScheduledThreadPoolExecutor(1)
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(jobExecutor)
-  var config: Config = _
+  private var config: Config = _
   private val logger = LoggerFactory.getLogger(getClass)
   private lazy val md = MessageDigest.getInstance("SHA-256")
   private val methods = List[(String, JSONObject => JSONObject)](
@@ -105,6 +105,8 @@ object RemoteConnectionServlet {
   )
   private var connectedSessions = Set[Session]()
   private var jobQueue = Queue[(String, Movie, DownloadStatus, Future[Unit])]()
+
+  def initConfig(c: Config): Unit = config = c
 
   startPinging()
 
