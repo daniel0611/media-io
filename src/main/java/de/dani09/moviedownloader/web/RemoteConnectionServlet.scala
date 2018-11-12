@@ -187,12 +187,19 @@ object RemoteConnectionServlet {
     logger.info(s"Download Job with hash $jobHash started")
 
     val mdu = new MovieDownloaderUtil(config, new PrintStream(new ByteArrayOutputStream()))
+
+    var timesProgressCalled = 0
     mdu.downloadMovie(job._2, new HttpProgressListener {
       override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
 
       override def onProgress(v: Double): Unit = {}
 
-      override def onProgress(done: Long, max: Long): Unit = broadcastJobStatus(job, done, max)
+      override def onProgress(done: Long, max: Long): Unit = {
+        timesProgressCalled += 1
+
+        if (timesProgressCalled % 35 == 0)
+          broadcastJobStatus(job, done, max)
+      }
 
       override def onFinish(): Unit = {}
     })
