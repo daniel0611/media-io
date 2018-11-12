@@ -64,7 +64,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
       DownloadedMovies
         .deserialize(conf).withLocalDownloadUrls
         .getMovies
-        .filter(m => channel == "" | channel == m.tvChannel) // all if no channel was specified and otherwise check if channel is the same
+        .filter(m => channel == m.tvChannel.toUpperCase) // check if channel is the same
         .map(_.seriesTitle)
         .distinct
         .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
