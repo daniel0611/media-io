@@ -14,7 +14,7 @@ assemblyJarName in assembly := "MovieDownloader.jar"
 libraryDependencies ++= Seq(
   "de.mediathekview" % "MLib" % "3.0.2",
   "org.json" % "json" % "20180813",
-  "de.dani09" % "dani-http" % "0.4.1",
+  "de.dani09" % "dani-http" % "0.4.2",
   "me.tongfei" % "progressbar" % "0.7.2",
   "com.github.scopt" %% "scopt" % "3.7.0",
 
