@@ -153,16 +153,10 @@ object RemoteConnectionServlet {
   private def broadcast(json: JSONObject): Unit = broadcast(json.toString)
 
   private def jobStatus(j: JSONObject): JSONObject = {
-    val hash = j.optString("hash")
+    val obj = getHashOfJSONObject(j)
+    val hash = obj.optString("hash")
     if (hash.isEmpty)
-      return new JSONObject()
-        .put("status", "error")
-        .put("message", "Hash not found in json")
-
-    if (hash.length != 7)
-      return new JSONObject()
-        .put("status", "error")
-        .put("message", "hash has the wrong length")
+      return obj
 
     val job = jobQueue.find(_._1 == hash)
     if (job.isEmpty)
@@ -226,6 +220,22 @@ object RemoteConnectionServlet {
         base.put("progress", progress)
           .put("maxProgress", maxProgress)
     )
+  }
+
+  private def getHashOfJSONObject(j: JSONObject): JSONObject = {
+    val hash = j.optString("hash")
+    if (hash.isEmpty)
+      return new JSONObject()
+        .put("status", "error")
+        .put("message", "Hash not found in json")
+
+    if (hash.length != 7)
+      return new JSONObject()
+        .put("status", "error")
+        .put("message", "hash has the wrong length")
+
+    new JSONObject()
+      .put("hash", hash)
   }
 
   private def sha256(s: String): String = {
