@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "org.eclipse.jetty.websocket" % "websocket-server" % "9.4.6.v20170531",
 )
 
-lazy val createVersionFile = taskKey[Unit]("Creates a version file so the version is visible in --help")
+lazy val createVersionFile = taskKey[Unit]("Creates file containing the current version for use by the cli")
 createVersionFile := {
   val resourceDir = (resourceDirectory in Compile).value
 
