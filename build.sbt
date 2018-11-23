@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
   "org.eclipse.jetty" % "jetty-webapp" % "9.4.6.v20170531",
   "org.eclipse.jetty.websocket" % "websocket-server" % "9.4.6.v20170531",
+  "org.eclipse.jetty.websocket" % "websocket-client" % "9.4.6.v20170531",
 )
 
 lazy val createVersionFile = taskKey[Unit]("Creates file containing the current version for use by the cli")

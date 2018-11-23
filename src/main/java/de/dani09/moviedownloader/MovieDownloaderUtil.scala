@@ -5,10 +5,11 @@ import java.net.URL
 import java.nio.file.{Files, Path}
 
 import de.dani09.http.{Http, HttpProgressListener}
-import de.dani09.moviedownloader.config.Config
+import de.dani09.moviedownloader.config.{CLIConfig, Config}
 import de.dani09.moviedownloader.data.DatenFilmToMovieConverter._
 import de.dani09.moviedownloader.data.Movie
 import de.dani09.moviedownloader.data.ProgressBarBuilder2HttpProgressListener._
+import de.dani09.moviedownloader.web.RemoteConnectionClient
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -19,7 +20,7 @@ import scala.collection.JavaConverters._
 import scala.collection.parallel.ParSeq
 import scala.io.Source
 
-class MovieDownloaderUtil(config: Config, out: PrintStream = System.out) {
+class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CLIConfig = new CLIConfig()) {
 
   def saveMovieData(destination: Path, diff: Boolean, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     val downloadUrl = if (diff) config.movieDataDiffSource else config.movieDataSource
@@ -66,10 +67,18 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out) {
   }
 
   def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
-    val destinationPath = getMovieSavePath(movie)
-    val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
+    if (cli.remoteServer != null && cli.remoteServer.nonEmpty) {
+      val pb = getStandardProgressBar
+        .setInitialMax(movie.sizeInMb * 1048576L)
+        .build()
 
-    downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
+      new RemoteConnectionClient(movie, listener, cli.remoteServer, pb).downloadMovieOnRemote()
+    } else {
+      val destinationPath = getMovieSavePath(movie)
+      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
+
+      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
+    }
   }
 
   private def isFileUpToDate(file: File, url: URL): Boolean = {
@@ -83,14 +92,15 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out) {
     }
   }
 
-  private def getProgressBarHttpListener: HttpProgressListener = {
+  private def getStandardProgressBar: ProgressBarBuilder = {
     new ProgressBarBuilder()
       .setStyle(ProgressBarStyle.ASCII)
       .setUnit("MB", 1048576)
       .setUpdateIntervalMillis(1000)
       .showSpeed()
-      .toHttpProgressListener
   }
+
+  private def getProgressBarHttpListener: HttpProgressListener = getStandardProgressBar.toHttpProgressListener
 
   private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     var outStream: FileOutputStream = null

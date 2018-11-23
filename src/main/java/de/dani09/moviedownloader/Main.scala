@@ -47,20 +47,23 @@ object Main {
       System.exit(0)
     }
 
-    downloadMovies(config, cliConf.diff)
+    downloadMovies(config, cliConf)
   }
 
-  def downloadMovies(config: Config, diff: Boolean): Unit = {
+  def downloadMovies(config: Config, cli: CLIConfig): Unit = {
     val downloadedMovies = DownloadedMovies.deserialize(config)
 
-    val downloader = new MovieDownloaderUtil(config)
-    saveMovieData(downloader = downloader, diff = diff)
+    val downloader = new MovieDownloaderUtil(config, cli = cli)
+    saveMovieData(downloader = downloader, diff = cli.diff)
 
     var movies: ParSeq[Movie] = getMovies(downloader)
 
     movies = movies
       .filter(x => config.matchesMovie(x))
       .filter(_.exists())
+
+    movies.foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
+
     println(s"${movies.length} Movies matched Filters")
 
     movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))

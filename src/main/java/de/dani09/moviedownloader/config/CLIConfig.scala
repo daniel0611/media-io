@@ -35,10 +35,10 @@ object CLIConfig {
         .text("Only download the MovieList with the newest Movies")
         .action((_, c) => c.copy(diff = true))
 
-      /*      opt[String]('r', "remote")
-              .valueName("<url>")
-              .text("Execute download actions on a remote Server")
-              .action((v, c) => c.copy(remoteServer = v))*/
+      opt[String]('r', "remote")
+        .valueName("<url>")
+        .text("Execute download actions on a remote Server")
+        .action((v, c) => c.copy(remoteServer = v))
 
       note("")
       cmd("serve")

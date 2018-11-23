@@ -2,7 +2,6 @@ package de.dani09.moviedownloader.web
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 import java.nio.ByteBuffer
-import java.security.MessageDigest
 import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
 
 import de.dani09.http.HttpProgressListener
@@ -54,10 +53,11 @@ class RemoteConnectionServlet extends WebSocketServlet {
     val m = methods.find(_._1.equalsIgnoreCase(request._1))
 
     if (m.isDefined) {
-      val result = m.get._2(request._2)
+      val method = m.get
+      val result = method._2(request._2)
 
       if (result != null)
-        session.getRemote.sendString(result.toString)
+        session.getRemote.sendString(result.put("method", method._1).toString)
     } else {
       session.getRemote
         .sendString(
@@ -98,7 +98,6 @@ object RemoteConnectionServlet {
   private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(jobExecutor)
   private var config: Config = _
   private val logger = LoggerFactory.getLogger(getClass)
-  private lazy val md = MessageDigest.getInstance("SHA-256")
   private val methods = List[(String, JSONObject => JSONObject)](
     ("queueDownload", queueDownload),
     ("getJobStatus", jobStatus)
@@ -130,7 +129,7 @@ object RemoteConnectionServlet {
         .put("message", "movie in json not found")
 
     val movie = Movie.fromJson(data.get)
-    val hash = sha256(data.get.toString).substring(0, 7)
+    val hash = HashUtil.sha256Short(data.get.toString)
 
     val job = (hash, movie, QUEUED, getJobFuture(hash, config))
     jobQueue = jobQueue.enqueue(job).distinct
@@ -140,7 +139,7 @@ object RemoteConnectionServlet {
     new JSONObject()
       .put("status", "success")
       .put("message", "Successfully queued DownloadJob")
-      .put("place", jobQueue.length)
+      .put("place", jobQueue.count(_._3 != FINISHED))
       .put("hash", hash)
   }
 
@@ -236,11 +235,5 @@ object RemoteConnectionServlet {
 
     new JSONObject()
       .put("hash", hash)
-  }
-
-  private def sha256(s: String): String = {
-    md.digest(s.getBytes)
-      .map("%02x".format(_))
-      .mkString
   }
 }
