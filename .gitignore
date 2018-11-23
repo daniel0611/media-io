@@ -1,6 +1,7 @@
 .idea/
 MovieDownloader.iml
 config.json
+config.prod.json
 download
 out/
 target
