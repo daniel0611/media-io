@@ -5,15 +5,16 @@ import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.HttpProgressListener
 import de.dani09.moviedownloader.data.Movie
-import me.tongfei.progressbar.ProgressBar
+import me.tongfei.progressbar.{ProgressBar, ProgressBarBuilder}
 import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.annotations._
 import org.eclipse.jetty.websocket.client.WebSocketClient
 import org.json.JSONObject
 
 @WebSocket
-class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remote: String, progressBar: ProgressBar) {
+class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remote: String, progressBarBuilder: ProgressBarBuilder) {
   private val uri = new URI(s"ws://$remote/ws")
+  private var progressBar: ProgressBar = _
   private val latch = new CountDownLatch(1)
   private val hash = HashUtil.sha256Short(movie.toJson.toString)
 
@@ -84,15 +85,18 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
             val currentProgress = json.getLong("progress")
             val maxProgress = json.getLong("maxProgress")
 
-            progressBar.synchronized {
-              progressBar.maxHint(maxProgress)
-              progressBar.stepTo(currentProgress)
-            }
+            if (currentProgress == 0)
+              progressBar = progressBarBuilder.build()
+
+            progressBar.maxHint(maxProgress)
+            progressBar.stepTo(currentProgress)
           case "FINISHED" =>
             progressBar.close()
             println("Successfully downloaded movie on remote")
             latch.countDown()
         }
+
+      case _ =>
     }
   }
 

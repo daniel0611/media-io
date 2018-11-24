@@ -104,8 +104,12 @@ object RemoteConnectionServlet {
   )
   private var connectedSessions = Set[Session]()
   private var jobQueue = Queue[(String, Movie, DownloadStatus, Future[Unit])]()
+  private var movieDownloaderUtil: MovieDownloaderUtil = _
 
-  def initConfig(c: Config): Unit = config = c
+  def init(c: Config): Unit = {
+    config = c
+    movieDownloaderUtil = new MovieDownloaderUtil(config, new PrintStream(new ByteArrayOutputStream()))
+  }
 
   startPinging()
 
@@ -122,25 +126,57 @@ object RemoteConnectionServlet {
   }
 
   private def queueDownload(j: JSONObject): JSONObject = {
-    val data = Option(j.getJSONObject("movie"))
-    if (data.isEmpty)
-      return new JSONObject()
-        .put("status", "error")
-        .put("message", "movie in json not found")
+    val (movieObj, found) = getMovieInJSONObject(j)
+    if (!found)
+      return movieObj
 
-    val movie = Movie.fromJson(data.get)
-    val hash = HashUtil.sha256Short(data.get.toString)
+    val movie = Movie.fromJson(movieObj)
+    val hash = HashUtil.sha256Short(movieObj.toString)
 
-    val job = (hash, movie, QUEUED, getJobFuture(hash, config))
-    jobQueue = jobQueue.enqueue(job).distinct
+    if (!jobQueue.exists(_._1 == hash)) { // only if not already queued
+      val job = (hash, movie, QUEUED, getJobFuture(hash, config))
+      jobQueue = jobQueue.enqueue(job).distinct
 
-    logger.info(s"Download Job with hash $hash was enqueued")
+      logger.info(s"Download Job with hash $hash was enqueued")
+    }
 
     new JSONObject()
       .put("status", "success")
       .put("message", "Successfully queued DownloadJob")
-      .put("place", jobQueue.count(_._3 != FINISHED))
+      .put("place", jobQueue.filter(_._3 != FINISHED).map(_._1).indexOf(hash) + 1)
       .put("hash", hash)
+  }
+
+  private def getJobFuture(jobHash: String, config: Config): Future[Unit] = Future[Unit] {
+    val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
+    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
+    logger.info(s"Download Job with hash $jobHash started")
+
+    var timesProgressCalled = 0
+    movieDownloaderUtil.downloadMovie(job._2, new HttpProgressListener {
+      override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
+
+      override def onProgress(v: Double): Unit = {
+      }
+
+      override def onProgress(done: Long, max: Long): Unit = {
+        timesProgressCalled += 1
+
+        if (timesProgressCalled % 35 == 0)
+          broadcastJobStatus(job, done, max)
+      }
+
+      override def onFinish(): Unit = {
+      }
+    })
+
+    val dm = DownloadedMovies.deserialize(config)
+    dm.addMovie(job._2)
+    dm.serialize(config)
+
+    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job.copy(_3 = FINISHED) else j)
+    logger.info(s"Download Job with hash $jobHash finished")
+    broadcastJobStatus(job.copy(_3 = FINISHED))
   }
 
   private def broadcast(text: String): Unit = {
@@ -151,11 +187,36 @@ object RemoteConnectionServlet {
 
   private def broadcast(json: JSONObject): Unit = broadcast(json.toString)
 
+  private def getMovieInJSONObject(j: JSONObject): (JSONObject, Boolean) = {
+    val data = Option(j.getJSONObject("movie"))
+    if (data.isEmpty)
+      return (new JSONObject()
+        .put("status", "error")
+        .put("message", "movie in json not found"), false)
+
+    (data.get, true)
+  }
+
+  private def broadcastJobStatus(job: (String, Movie, DownloadStatus, Future[Unit]), progress: Long = 0, maxProgress: Long = 0): Unit = {
+    val base = new JSONObject()
+      .put("status", "update")
+      .put("hash", job._1)
+      .put("jobStatus", job._3.toString)
+
+    broadcast(
+      if (maxProgress == 0)
+        base
+      else
+        base.put("progress", progress)
+          .put("maxProgress", maxProgress)
+    )
+  }
+
   private def jobStatus(j: JSONObject): JSONObject = {
-    val obj = getHashOfJSONObject(j)
-    val hash = obj.optString("hash")
-    if (hash.isEmpty)
-      return obj
+    val (hashObj, found) = getHashOfJSONObject(j)
+    if (!found)
+      return hashObj
+    val hash = hashObj.getString("hash")
 
     val job = jobQueue.find(_._1 == hash)
     if (job.isEmpty)
@@ -174,66 +235,19 @@ object RemoteConnectionServlet {
     json.put("status", "success")
   }
 
-  private def getJobFuture(jobHash: String, config: Config): Future[Unit] = Future[Unit] {
-    val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
-    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
-    logger.info(s"Download Job with hash $jobHash started")
-
-    val mdu = new MovieDownloaderUtil(config, new PrintStream(new ByteArrayOutputStream()))
-
-    var timesProgressCalled = 0
-    mdu.downloadMovie(job._2, new HttpProgressListener {
-      override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
-
-      override def onProgress(v: Double): Unit = {}
-
-      override def onProgress(done: Long, max: Long): Unit = {
-        timesProgressCalled += 1
-
-        if (timesProgressCalled % 35 == 0)
-          broadcastJobStatus(job, done, max)
-      }
-
-      override def onFinish(): Unit = {}
-    })
-
-    val dm = DownloadedMovies.deserialize(config)
-    dm.addMovie(job._2)
-    dm.serialize(config)
-
-    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job.copy(_3 = FINISHED) else j)
-    logger.info(s"Download Job with hash $jobHash finished")
-    broadcastJobStatus(job.copy(_3 = FINISHED))
-  }
-
-  private def broadcastJobStatus(job: (String, Movie, DownloadStatus, Future[Unit]), progress: Long = 0, maxProgress: Long = 0): Unit = {
-    val base = new JSONObject()
-      .put("status", "update")
-      .put("hash", job._1)
-      .put("jobStatus", job._3.toString)
-
-    broadcast(
-      if (maxProgress == 0)
-        base
-      else
-        base.put("progress", progress)
-          .put("maxProgress", maxProgress)
-    )
-  }
-
-  private def getHashOfJSONObject(j: JSONObject): JSONObject = {
+  private def getHashOfJSONObject(j: JSONObject): (JSONObject, Boolean) = {
     val hash = j.optString("hash")
     if (hash.isEmpty)
-      return new JSONObject()
+      return (new JSONObject()
         .put("status", "error")
-        .put("message", "Hash not found in json")
+        .put("message", "Hash not found in json"), false)
 
     if (hash.length != 7)
-      return new JSONObject()
+      return (new JSONObject()
         .put("status", "error")
-        .put("message", "hash has the wrong length")
+        .put("message", "hash has the wrong length"), false)
 
-    new JSONObject()
-      .put("hash", hash)
+    (new JSONObject()
+      .put("hash", hash), true)
   }
 }

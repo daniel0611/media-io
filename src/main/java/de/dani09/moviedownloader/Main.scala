@@ -62,7 +62,8 @@ object Main {
       .filter(x => config.matchesMovie(x))
       .filter(_.exists())
 
-    movies.foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
+    if (cli.remoteServer != null && !cli.remoteServer.isEmpty)
+      movies.filter(downloader.isMovieAlreadyDownloaded).foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
 
     println(s"${movies.length} Movies matched Filters")
 
@@ -87,8 +88,10 @@ object Main {
         downloader.downloadMovie(mov)
         println()
 
-        downloadedMovies.addMovie(mov)
-        downloadedMovies.serialize(config)
+        if (cli.remoteServer != null && !cli.remoteServer.isEmpty) {
+          downloadedMovies.addMovie(mov)
+          downloadedMovies.serialize(config)
+        }
       })
 
     println("Done!")

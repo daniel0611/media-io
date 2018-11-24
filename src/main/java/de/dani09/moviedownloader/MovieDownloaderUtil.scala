@@ -68,11 +68,10 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
 
   def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     if (cli.remoteServer != null && cli.remoteServer.nonEmpty) {
-      val pb = getStandardProgressBar
+      val pbb = getStandardProgressBar
         .setInitialMax(movie.sizeInMb * 1048576L)
-        .build()
 
-      new RemoteConnectionClient(movie, listener, cli.remoteServer, pb).downloadMovieOnRemote()
+      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
     } else {
       val destinationPath = getMovieSavePath(movie)
       val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"

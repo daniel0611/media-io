@@ -31,7 +31,7 @@ object WebFrontendMode {
     mountScalatraServlet(new HealthServlet, "/health/*")
     mountJettyServlet(getMovieDirectoryServlet(config), "/data/*", context, "FileServerServlet")
     if (cli.remoteServer != null) {
-      RemoteConnectionServlet.initConfig(config)
+      RemoteConnectionServlet.init(config)
       mountJettyServlet(new ServletHolder(new RemoteConnectionServlet), "/ws/*", context, "RemoteConnectionServlet")
     }
 
