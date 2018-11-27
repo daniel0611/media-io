@@ -17,7 +17,6 @@ import org.json.{JSONException, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.Queue
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.Random
 
 @WebSocket(maxIdleTime = 10000)
@@ -95,7 +94,6 @@ class RemoteConnectionServlet extends WebSocketServlet {
 object RemoteConnectionServlet {
   private val jobExecutor = Executors.newFixedThreadPool(1)
   private val pingExecutor = new ScheduledThreadPoolExecutor(1)
-  private implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(jobExecutor)
   private var config: Config = _
   private val logger = LoggerFactory.getLogger(getClass)
   private val methods = List[(String, JSONObject => JSONObject)](
@@ -103,7 +101,7 @@ object RemoteConnectionServlet {
     ("getJobStatus", jobStatus)
   )
   private var connectedSessions = Set[Session]()
-  private var jobQueue = Queue[(String, Movie, DownloadStatus, Future[Unit])]()
+  private var jobQueue = Queue[(String, Movie, DownloadStatus, Runnable)]()
   private var movieDownloaderUtil: MovieDownloaderUtil = _
 
   def init(c: Config): Unit = {
@@ -134,10 +132,12 @@ object RemoteConnectionServlet {
     val hash = HashUtil.sha256Short(movieObj.toString)
 
     if (!jobQueue.exists(_._1 == hash)) { // only if not already queued
-      val job = (hash, movie, QUEUED, getJobFuture(hash, config))
+      val runnable = getJobRunnable(hash, config)
+      val job = (hash, movie, QUEUED, runnable)
       jobQueue = jobQueue.enqueue(job).distinct
 
-      logger.info(s"Download Job with hash $hash was enqueued")
+      jobExecutor.submit(runnable)
+      logger.info(s"Download job with hash $hash was enqueued")
     }
 
     new JSONObject()
@@ -147,7 +147,12 @@ object RemoteConnectionServlet {
       .put("hash", hash)
   }
 
-  private def getJobFuture(jobHash: String, config: Config): Future[Unit] = Future[Unit] {
+  //noinspection ConvertExpressionToSAM
+  private def getJobRunnable(jobHash: String, config: Config): Runnable = new Runnable {
+    override def run(): Unit = generateJobFunction(jobHash, config).apply()
+  }
+
+  private def generateJobFunction(jobHash: String, config: Config): () => Unit = () => {
     val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
     jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
     logger.info(s"Download Job with hash $jobHash started")
@@ -197,7 +202,7 @@ object RemoteConnectionServlet {
     (data.get, true)
   }
 
-  private def broadcastJobStatus(job: (String, Movie, DownloadStatus, Future[Unit]), progress: Long = 0, maxProgress: Long = 0): Unit = {
+  private def broadcastJobStatus(job: (String, Movie, DownloadStatus, Runnable), progress: Long = 0, maxProgress: Long = 0): Unit = {
     val base = new JSONObject()
       .put("status", "update")
       .put("hash", job._1)
