@@ -15,7 +15,8 @@ object InteractiveMode {
       minimumSize = 0, minimumLength = 0, maxDaysOld = 0,
       movieFilters = List[MovieFilter](),
       movieDataSource = getMovieDataSource(config),
-      movieDataDiffSource = getMovieDataDiffSource(config)))
+      movieDataDiffSource = getMovieDataDiffSource(config)),
+      cli = cli)
 
     Main.saveMovieData(downloader = dl, diff = cli.diff)
     val movies = Main.getMovies(dl)

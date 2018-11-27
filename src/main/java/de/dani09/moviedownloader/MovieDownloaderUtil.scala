@@ -1,7 +1,7 @@
 package de.dani09.moviedownloader
 
 import java.io.{File, FileOutputStream, PrintStream}
-import java.net.URL
+import java.net.{URL, URLEncoder}
 import java.nio.file.{Files, Path}
 
 import de.dani09.http.{Http, HttpProgressListener}
@@ -20,6 +20,7 @@ import scala.collection.JavaConverters._
 import scala.collection.parallel.ParSeq
 import scala.io.Source
 
+
 class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CLIConfig = new CLIConfig()) {
 
   def saveMovieData(destination: Path, diff: Boolean, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
@@ -29,10 +30,26 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   }
 
   def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
-    val path: Path = getMovieSavePath(movie)
-    val file = path.toFile
+    if (isRemote) {
+      val rawPath = movie.getRelativeSavePath.toString
+      val rawUrl = movie.downloadUrl.toURI.toString
+      val path = URLEncoder.encode(rawPath, "utf8")
+      val url = URLEncoder.encode(rawUrl, "utf8")
 
-    isFileUpToDate(file, movie.downloadUrl)
+      val response = Http.get(s"http://${cli.remoteServer}/api/isMovieDownloaded?path=$path&url=$url").execute()
+
+      response.getResponseString match {
+        case "true" => true
+        case "false" => false
+        case e: String =>
+          out.println("Could not find out if movie is downloaded on remote: ")
+          out.println(e)
+          false
+      }
+    } else {
+      val file = getMovieSavePath(movie).toFile
+      isFileUpToDate(file, movie.downloadUrl)
+    }
   }
 
   //noinspection SpellCheckingInspection
@@ -66,21 +83,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     movies ++ getIncludedMovies.par // add manually included Movies
   }
 
-  def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
-    if (cli.remoteServer != null && cli.remoteServer.nonEmpty) {
-      val pbb = getStandardProgressBar
-        .setInitialMax(movie.sizeInMb * 1048576L)
-
-      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
-    } else {
-      val destinationPath = getMovieSavePath(movie)
-      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
-
-      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
-    }
-  }
-
-  private def isFileUpToDate(file: File, url: URL): Boolean = {
+  def isFileUpToDate(file: File, url: URL): Boolean = {
     try {
       val connection = url.openConnection()
       val fullSize = connection.getContentLengthLong
@@ -90,6 +93,8 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
       case _: Throwable => false
     }
   }
+
+  private def isRemote: Boolean = cli.remoteServer != null && cli.remoteServer.nonEmpty
 
   private def getStandardProgressBar: ProgressBarBuilder = {
     new ProgressBarBuilder()
@@ -162,6 +167,20 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
       case e: JSONException =>
         out.println(s"Couldn't parse include.json: ${e.getMessage}")
         emptyList // also return an empty list if there is an parsing error
+    }
+  }
+
+  def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
+    if (isRemote) {
+      val pbb = getStandardProgressBar
+        .setInitialMax(movie.sizeInMb * 1048576L)
+
+      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
+    } else {
+      val destinationPath = getMovieSavePath(movie)
+      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
+
+      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
     }
   }
 }

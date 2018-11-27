@@ -1,7 +1,10 @@
 package de.dani09.moviedownloader.web
 
+import java.io.{ByteArrayOutputStream, PrintStream}
 import java.net.{URL, URLEncoder}
+import java.nio.file.Paths
 
+import de.dani09.moviedownloader.MovieDownloaderUtil
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
 import de.dani09.moviedownloader.data.Movie
 import de.dani09.moviedownloader.web.WebFrontendServlet.LocalDownloadedMovies
@@ -9,10 +12,12 @@ import org.json.{JSONArray, JSONObject}
 import org.scalatra.ScalatraServlet
 import org.slf4j.LoggerFactory
 
+
 class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
   private val logger = LoggerFactory.getLogger(getClass)
   private implicit val servlet: ScalatraServlet = this
+  private lazy val mdu = new MovieDownloaderUtil(conf, new PrintStream(new ByteArrayOutputStream()), cli)
 
   before() {
     contentType = "application/json"
@@ -86,6 +91,24 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
         .map(_.toJson)
         .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
         .toString
+    }
+  }
+
+  get("/isMovieDownloaded") {
+    val path = params.getOrElse("path", "")
+    val url = params.getOrElse("url", "")
+
+    if (path.isEmpty) {
+      status = 400
+      "Path not defined"
+    } else if (url.isEmpty) {
+      status = 400
+      "Url not defined"
+    } else {
+      val moviePath = Paths.get(path)
+      val f = conf.downloadDirectory.resolve(moviePath).toFile
+
+      mdu.isFileUpToDate(f, new URL(url))
     }
   }
 }
