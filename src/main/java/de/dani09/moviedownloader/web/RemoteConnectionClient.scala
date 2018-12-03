@@ -109,7 +109,7 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
 
   @OnWebSocketClose
   def onClose(s: Session, code: Int, reason: String): Unit = {
-    println(s"Disconnected from remote. disconnect code: $code, reason: $reason")
+    println(s"Disconnected from remote.")
     latch.countDown()
   }
 }

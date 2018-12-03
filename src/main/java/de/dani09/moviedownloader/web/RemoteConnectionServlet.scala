@@ -167,7 +167,7 @@ object RemoteConnectionServlet {
       override def onProgress(done: Long, max: Long): Unit = {
         timesProgressCalled += 1
 
-        if (timesProgressCalled % 35 == 0)
+        if (timesProgressCalled % 100 == 0)
           broadcastJobStatus(job, done, max)
       }
 
