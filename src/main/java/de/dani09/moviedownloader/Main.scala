@@ -15,7 +15,7 @@ object Main {
   val movieListFileName = "movie-data.xz"
 
   def main(args: Array[String]): Unit = {
-    val cliConf = CLIConfig.parse(args)
+    var cliConf = CLIConfig.parse(args)
     var config: Config = null
 
     try {
@@ -29,8 +29,12 @@ object Main {
         System.exit(1)
     }
 
-    if (config != null)
+    if (config != null) {
+      if (config.remote != null)
+        cliConf = cliConf.copy(remoteServer = config.remote)
+
       println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
+    }
 
     if (cliConf.interactive) {
       InteractiveMode.start(config, cliConf)
@@ -43,7 +47,7 @@ object Main {
     }
 
     if (cliConf.serveWebFrontend) {
-      WebFrontendMode.start(config, cliConf)
+      WebFrontendMode.start(config, cliConf.copy(remoteServer = ""))
       System.exit(0)
     }
 

@@ -17,7 +17,8 @@ class Config(
               val maxDaysOld: Int,
               val movieFilters: List[MovieFilter],
               val movieDataSource: URL,
-              val movieDataDiffSource: URL
+              val movieDataDiffSource: URL,
+              val remote: String
             ) {
 
   def matchesMovie(movie: Movie): Boolean = {
@@ -62,7 +63,8 @@ object Config {
       maxDaysOld = configJson.optInt("maxDaysOld", 0),
       movieFilters = filters,
       movieDataSource = new URL(configJson.optString("movieDataSource", getMovieDataSourceDefaultValue)),
-      movieDataDiffSource = new URL(configJson.optString("movieDataSourceDiff", getMovieDataSourceDefaultValue))
+      movieDataDiffSource = new URL(configJson.optString("movieDataSourceDiff", getMovieDataSourceDefaultValue)),
+      remote = configJson.optString("remote", null)
     )
   }
 
