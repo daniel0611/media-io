@@ -86,8 +86,6 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
           }
 
           println(s"Download for movie got queued and currently is place $place")
-
-          progressBar = progressBarBuilder.build()
       }
 
       case _ if status == "update" && json.getString("hash") == hash => // update message from remote
@@ -96,7 +94,12 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
             val currentProgress = json.optLong("progress", -1)
             val maxProgress = json.optLong("maxProgress", -1)
 
-            if (maxProgress > 0 && currentProgress > 0) {
+            if (currentProgress == 0) {
+              println("Download has started on remote")
+              progressBar = progressBarBuilder.build()
+            }
+
+            if (maxProgress > 0 && currentProgress > 0 && progressBar != null) {
               progressBar.maxHint(maxProgress)
               progressBar.stepTo(currentProgress)
             }
