@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader.web
 
-import java.net.{ConnectException, URI}
+import java.net.URI
 import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.HttpProgressListener
@@ -10,6 +10,8 @@ import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.annotations._
 import org.eclipse.jetty.websocket.client.WebSocketClient
 import org.json.JSONObject
+
+import scala.concurrent.ExecutionException
 
 @WebSocket
 class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remote: String, progressBarBuilder: ProgressBarBuilder) {
@@ -29,16 +31,23 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
 
       latch.await()
     } catch {
-      case e: ConnectException => println(s"Could't connect to remote: ${e.getMessage}")
+      case e: ExecutionException if e.getMessage.contains("java.net.ConnectException") =>
+        if (e.getMessage.toLowerCase.contains("connection refused")) {
+          println("Remote is unavailable!")
+          System.exit(1)
+        } else
+          println(s"Could't connect to remote: ${e.getMessage}")
       case e: Throwable =>
-        println(s"An error occurred: $e")
+        println(e.getMessage)
         e.printStackTrace()
+        System.exit(1)
     } finally {
       if (session != null)
         session.close()
       if (client != null)
         client.stop()
-      progressBar.close()
+      if (progressBar != null)
+        progressBar.close()
     }
   }
 
@@ -103,7 +112,7 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
 
   @OnWebSocketError
   def onError(s: Session, e: Throwable): Unit = {
-    println(s"An error occurred: $e")
+    //println(s"An error occurred: $e")
     latch.countDown()
   }
 
