@@ -66,7 +66,7 @@ object Main {
       .filter(x => config.matchesMovie(x))
       .filter(_.exists())
 
-    if (cli.remoteServer != null && !cli.remoteServer.isEmpty)
+    if (cli.remoteServer == null || cli.remoteServer.isEmpty) // only if not connected to remote
       movies.filter(downloader.isMovieAlreadyDownloaded).foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
 
     println(s"${movies.length} Movies matched Filters")
@@ -92,7 +92,7 @@ object Main {
         downloader.downloadMovie(mov)
         println()
 
-        if (cli.remoteServer != null && !cli.remoteServer.isEmpty) {
+        if (cli.remoteServer == null || cli.remoteServer.isEmpty) {
           downloadedMovies.addMovie(mov)
           downloadedMovies.serialize(config)
         }
