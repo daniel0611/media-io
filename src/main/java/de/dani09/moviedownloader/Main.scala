@@ -71,7 +71,11 @@ object Main {
 
     println(s"${movies.length} Movies matched Filters")
 
-    movies = movies.filter(x => !downloader.isMovieAlreadyDownloaded(x))
+    movies = movies
+      .filter(x => !downloader.isMovieAlreadyDownloaded(x))
+      .toList
+      .sortBy(_.releaseDate.getTime)
+      .par
     println(s"${movies.length} not already downloaded")
 
     System.gc()

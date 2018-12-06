@@ -18,13 +18,15 @@ case class Movie(downloadUrl: URL,
                 ) {
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
-    println(s"DownloadUrl:\t$downloadUrl")
-    println(s"TvStation:\t$tvChannel")
-    println(s"SeriesTitle:\t$seriesTitle")
-    println(s"EpisodeTitle:\t$episodeTitle")
-    println(s"ReleaseDate:\t$releaseDate")
-    println(s"Length:\t\t$lengthInMinutes Minutes")
-    println(s"Size:\t\t$sizeInMb Mb")
+    def withSpaces(text: String) = text.padTo(15, ' ')
+
+    println(s"${withSpaces("DownloadUrl:")}$downloadUrl")
+    println(s"${withSpaces("TvStation:")}$tvChannel")
+    println(s"${withSpaces("SeriesTitle:")}$seriesTitle")
+    println(s"${withSpaces("EpisodeTitle:")}$episodeTitle")
+    println(s"${withSpaces("ReleaseDate:")}$releaseDate")
+    println(s"${withSpaces("Length:")}$lengthInMinutes Minutes")
+    println(s"${withSpaces("Size:")}$sizeInMb Mb")
 
     if (withEmptyLineAtEnd) println()
   }

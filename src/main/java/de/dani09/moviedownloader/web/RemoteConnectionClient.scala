@@ -104,7 +104,8 @@ class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remot
               progressBar.stepTo(currentProgress)
             }
           case "FINISHED" =>
-            progressBar.close()
+            if (progressBar != null)
+              progressBar.close()
             println("Successfully downloaded movie on remote")
             latch.countDown()
         }

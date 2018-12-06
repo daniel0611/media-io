@@ -30,6 +30,7 @@ object InteractiveMode {
         .filter(m => filter.matchesMovie(m))
         .filter(_.exists())
         .toList
+        .sortBy(_.releaseDate.getTime)
 
       println(s"${matchedMovies.length} Movies matched entered Filter!")
 
