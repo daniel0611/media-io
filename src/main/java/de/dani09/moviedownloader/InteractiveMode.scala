@@ -123,7 +123,12 @@ object InteractiveMode {
 
   private def createMovieFilter(s: Scanner): MovieFilter = {
     println("Enter an TvChannel:")
-    val channel = s.nextLine()
+    var channel = ""
+    try {
+      channel = s.nextLine()
+    } catch {
+      case _: NoSuchElementException => System.exit(0)
+    }
 
     println("Enter an SeriesTitle Regex (empty to match anything) ")
     val seriesTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
