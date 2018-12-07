@@ -9,6 +9,8 @@ import scala.language.implicitConversions
 
 //noinspection SpellCheckingInspection
 class DatenFilmToMovieConverter(mov: DatenFilm) {
+  private lazy val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
+
   def toMovie: Movie = {
     val arr = proccessArray(mov.arr)
     if (arr.size < 8) {
@@ -18,11 +20,11 @@ class DatenFilmToMovieConverter(mov: DatenFilm) {
     try {
       val releaseDateString = arr(3)
       val releaseTimeString = arr(4)
-      val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
+
       val releaseDate = releaseDateParser.parse(s"$releaseTimeString $releaseDateString")
 
       new Movie(
-        downloadUrl = new URL(mov.getUrl),
+        downloadUrl = new URL(mov.getUrlFuerAufloesung(DatenFilm.AUFLOESUNG_HD)),
         tvChannel = arr.head,
         seriesTitle = arr(1),
         episodeTitle = arr(2),
