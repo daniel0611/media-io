@@ -39,7 +39,7 @@ case class Movie(downloadUrl: URL,
     val calendar = Calendar.getInstance()
     calendar.setTime(releaseDate)
 
-    val dateString = s"${calendar.get(Calendar.DAY_OF_MONTH)}.${calendar.get(Calendar.MONTH)}.${calendar.get(Calendar.YEAR)}"
+    val dateString = s"${calendar.get(Calendar.DAY_OF_MONTH)}.${calendar.get(Calendar.MONTH) + 1}.${calendar.get(Calendar.YEAR)}"
     val fileExtension = getFileExtension(downloadUrl)
 
     val title = seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
