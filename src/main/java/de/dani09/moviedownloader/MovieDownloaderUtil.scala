@@ -88,7 +88,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
       val connection = url.openConnection()
       val fullSize = connection.getContentLengthLong
 
-      file.length() == fullSize
+      file.length() >= fullSize
     } catch {
       case _: Throwable => false
     }
