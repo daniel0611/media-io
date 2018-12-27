@@ -12,7 +12,6 @@ import org.json.{JSONArray, JSONObject}
 import org.scalatra.ScalatraServlet
 import org.slf4j.LoggerFactory
 
-
 class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
   private val logger = LoggerFactory.getLogger(getClass)
@@ -88,6 +87,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
         .deserialize(conf).withLocalDownloadUrls
         .getMovies
         .filter(_.seriesTitle.toLowerCase == series)
+        .sortBy(_.releaseDate.getTime)
         .map(_.toJson)
         .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
         .toString
