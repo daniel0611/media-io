@@ -30,7 +30,7 @@ object Main {
     }
 
     if (config != null) {
-      if (config.remote != null)
+      if (config.remote != null && cliConf.remoteServer == null)
         cliConf = cliConf.copy(remoteServer = config.remote)
 
       println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
