@@ -153,35 +153,41 @@ object RemoteConnectionServlet {
   }
 
   private def generateJobFunction(jobHash: String, config: Config): () => Unit = () => {
-    val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
-    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
-    logger.info(s"Download Job with hash $jobHash started")
+    try {
+      val job = jobQueue.find(_._1 == jobHash).get.copy(_3 = DOWNLOADING) // get job with updated status
+      jobQueue = jobQueue.map(j => if (j._1 == jobHash) job else j) // update job in queue
+      logger.info(s"Download job with hash $jobHash started")
 
-    var timesProgressCalled = 0
-    movieDownloaderUtil.downloadMovie(job._2, new HttpProgressListener {
-      override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
+      var timesProgressCalled = 0
+      movieDownloaderUtil.downloadMovie(job._2, new HttpProgressListener {
+        override def onStart(l: Long): Unit = broadcastJobStatus(job, 0, l)
 
-      override def onProgress(v: Double): Unit = {
-      }
+        override def onProgress(v: Double): Unit = {
+        }
 
-      override def onProgress(done: Long, max: Long): Unit = {
-        timesProgressCalled += 1
+        override def onProgress(done: Long, max: Long): Unit = {
+          timesProgressCalled += 1
 
-        if (timesProgressCalled % 100 == 0)
-          broadcastJobStatus(job, done, max)
-      }
+          if (timesProgressCalled % 100 == 0)
+            broadcastJobStatus(job, done, max)
+          if (timesProgressCalled % 2000 == 0)
+            logger.info(s"Download job with hash $jobHash has ${done / 1048576}MB of ${max / 1048576}MB downloaded")
+        }
 
-      override def onFinish(): Unit = {
-      }
-    })
+        override def onFinish(): Unit = {
+        }
+      })
 
-    val dm = DownloadedMovies.deserialize(config)
-    dm.addMovie(job._2)
-    dm.serialize(config)
+      val dm = DownloadedMovies.deserialize(config)
+      dm.addMovie(job._2)
+      dm.serialize(config)
 
-    jobQueue = jobQueue.map(j => if (j._1 == jobHash) job.copy(_3 = FINISHED) else j)
-    logger.info(s"Download Job with hash $jobHash finished")
-    broadcastJobStatus(job.copy(_3 = FINISHED))
+      jobQueue = jobQueue.map(j => if (j._1 == jobHash) job.copy(_3 = FINISHED) else j)
+      logger.info(s"Download Job with hash $jobHash finished")
+      broadcastJobStatus(job.copy(_3 = FINISHED))
+    } catch {
+      case e: Throwable => logger.error(s"an error occurred while executing job $jobHash: ${e.getMessage}")
+    }
   }
 
   private def broadcast(text: String): Unit = {
