@@ -11,6 +11,7 @@ RUN \
   sbt sbtVersion
 
 # get dependencies
+RUN mkdir /build
 WORKDIR /build
 COPY build.sbt /build
 COPY project /build/project
