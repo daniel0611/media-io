@@ -1,5 +1,6 @@
 package de.dani09.moviedownloader
 
+import java.io.PrintStream
 import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
@@ -15,6 +16,7 @@ object Main {
   val movieListFileName = "movie-data.xz"
 
   def main(args: Array[String]): Unit = {
+    registerFilteredPrintStream()
     var cliConf = CLIConfig.parse(args)
     var config: Config = null
 
@@ -124,5 +126,21 @@ object Main {
     println(s"${movies.length} Movies found in total")
 
     movies
+  }
+
+  /**
+    * Creates and sets a PrintStream that filters all write calls from de.mediathekview.mlib
+    */
+  def registerFilteredPrintStream(): Unit = {
+    val original = System.out
+    val filteredStream = new PrintStream((b: Int) => {
+      val trace = Thread.currentThread().getStackTrace
+      val count = trace.count(_.getClassName.startsWith("de.mediathekview.mlib"))
+
+      if (count < 1)
+        original.write(b)
+    })
+
+    System.setOut(filteredStream)
   }
 }

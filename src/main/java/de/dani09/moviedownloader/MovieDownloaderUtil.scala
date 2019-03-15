@@ -54,14 +54,12 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
 
   //noinspection SpellCheckingInspection
   def getMovieList(movieDataPath: Path): ParSeq[Movie] = {
-    val l = new FilmlisteLesen() // TODO parse without Library
+    val l = new FilmlisteLesen()
 
     var done = false
     l.addAdListener(new ListenerFilmeLaden() {
       override def fertig(e: ListenerFilmeLadenEvent): Unit = {
         super.fertig(e)
-        if (e.fehler)
-          out.println(e.text)
         done = true
       }
     })
