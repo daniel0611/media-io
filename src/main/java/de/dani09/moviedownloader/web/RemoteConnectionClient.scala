@@ -13,6 +13,10 @@ import org.json.JSONObject
 
 import scala.concurrent.ExecutionException
 
+/**
+  * Client for downloading movies on a remote server.
+  * To be instanced by MovieDownloaderUtil when a remote server is specified
+  */
 @WebSocket
 class RemoteConnectionClient(movie: Movie, listener: HttpProgressListener, remote: String, progressBarBuilder: ProgressBarBuilder) {
   private val uri = new URI(s"ws://$remote/ws")

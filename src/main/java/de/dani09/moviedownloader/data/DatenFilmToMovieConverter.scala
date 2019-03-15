@@ -11,6 +11,11 @@ import scala.language.implicitConversions
 class DatenFilmToMovieConverter(mov: DatenFilm) {
   private lazy val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
 
+  /**
+    * Converts a "DatenFilm" instance into an movie for better handling
+    *
+    * @return the parsed movie. null if some error occured
+    */
   def toMovie: Movie = {
     try {
       val releaseDateString = mov.arr(6)

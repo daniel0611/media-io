@@ -10,11 +10,9 @@ import de.dani09.moviedownloader.data.Movie
 import de.dani09.moviedownloader.web.WebFrontendServlet.LocalDownloadedMovies
 import org.json.{JSONArray, JSONObject}
 import org.scalatra.ScalatraServlet
-import org.slf4j.LoggerFactory
 
 class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
-  private val logger = LoggerFactory.getLogger(getClass)
   private implicit val servlet: ScalatraServlet = this
   private lazy val mdu = new MovieDownloaderUtil(conf, new PrintStream(new ByteArrayOutputStream()), cli)
 
@@ -63,7 +61,7 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
 
     if (channel.isEmpty) {
       status = 400
-      "Please specify a TvChannel"
+      "Please specify a tvChannel"
     } else {
       DownloadedMovies
         .deserialize(conf).withLocalDownloadUrls
@@ -128,7 +126,7 @@ object WebFrontendServlet {
       val encoded = m.getRelativeSavePath.toString
         .split("/") // do not encode slashes
         .map(u => URLEncoder.encode(u, "utf8"))
-        .map(_.replaceAll("\\+", "%20")) // replace + with %20
+        .map(_.replaceAll("\\+", "%20")) // replace + with %20 (proper whitespaces)
         .reduceLeft((a, b) => a + "/" + b) // put url back together
 
       new URL(servlet.fullUrl("/data/" + encoded, includeServletPath = false)(servlet.request, servlet.response))

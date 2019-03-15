@@ -16,9 +16,9 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   def this() = this(ListBuffer[Movie]()) // empty constructor
 
   /**
-    * Serializes the DownloadedMovies list by converting it to json and writing it to the File "downloaded-movies.json"
+    * Serializes the DownloadedMovies list by converting it to json and writing it to the file "downloaded-movies.json"
     *
-    * @param config config is needed to get the Path where the file will be saved
+    * @param config config is needed to get the path where the file will be saved
     */
   def serialize(config: Config): Unit = {
     val file = DownloadedMovies.getDownloadedMoviesFile(config)
@@ -31,9 +31,9 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   }
 
   /**
-    * Converts the List of DownloadedMovies into an JSONArray
+    * Converts the list of DownloadedMovies into an JSONArray
     *
-    * @return returns this List as an JSONArray
+    * @return returns this list as an JSONArray
     */
   def toJson: JSONArray = {
     movies
@@ -44,16 +44,16 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   }
 
   /**
-    * Adds the Movie to the List
+    * Adds the movie to the list
     *
-    * @param m the Movie you want to add
+    * @param m the movie you want to add
     */
   def addMovie(m: Movie): Unit = movies += m
 
   /**
-    * Get all Movies as an Scala ListBuffer
+    * Get all movies as an Scala ListBuffer
     *
-    * @return all Movies
+    * @return all movies
     */
   def getMovies: ListBuffer[Movie] = movies
 }
@@ -61,10 +61,10 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
 object DownloadedMovies {
 
   /**
-    * deSerializes an DownloadedMovies List by parsing the file in which it is stored and parsing this json
+    * deSerializes an DownloadedMovies list by parsing the file in which it is stored and parsing this json
     *
-    * @param config config is needed to get the Path where the file is located
-    * @return returns an instance of DownloadedMovies with the parsed Data
+    * @param config config is needed to get the path where the file is located
+    * @return returns an instance of DownloadedMovies with the parsed data
     */
   def deserialize(config: Config): DownloadedMovies = {
     val file = getDownloadedMoviesFile(config)
@@ -96,10 +96,10 @@ object DownloadedMovies {
   }
 
   /**
-    * get the Path where the DownloadedMovies File is located
+    * get the path where the DownloadedMovies file is located
     *
     * @param config config is needed to get the DownloadDirectory
-    * @return returns the Path where the File is
+    * @return returns the path where the file is
     */
   private def getDownloadedMoviesFile(config: Config): File = Paths
     .get(config.downloadDirectory.toString, "./downloaded-movies.json")

@@ -32,7 +32,7 @@ object InteractiveMode {
         .toList
         .sortBy(_.releaseDate.getTime)
 
-      println(s"${matchedMovies.length} Movies matched entered Filter!")
+      println(s"${matchedMovies.length} movies matched entered filter!")
 
       displayMovies(dl, s, matchedMovies, config)
     }
@@ -56,7 +56,7 @@ object InteractiveMode {
 
   private def getPath(config: Config, s: Scanner): Path = {
     if (config == null || config.downloadDirectory == null) {
-      print("Please enter an download Directory (default is \"./\") ")
+      print("Please enter an download directory (default is \"./\") ")
 
       val path = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse("./")
       Paths.get(path)
@@ -67,7 +67,7 @@ object InteractiveMode {
 
   private def displayMovies(dl: MovieDownloaderUtil, s: Scanner, movies: List[Movie], config: Config): Unit = {
     if (movies.isEmpty) {
-      println("Couldn't find any movies that matched this Filter")
+      println("Couldn't find any movies that matched this filter")
       return
     }
 
@@ -77,7 +77,7 @@ object InteractiveMode {
     if (answer.toLowerCase != "n") {
 
       if (movies.length > 50) {
-        print("That are a lot of Movies! Are you sure? (y/N) ")
+        print("That are a lot of movies! Are you sure? (y/N) ")
         val answer = s.nextLine()
         if (answer.toLowerCase != "y") return
       }
@@ -127,7 +127,7 @@ object InteractiveMode {
     try {
       channel = s.nextLine()
     } catch {
-      case _: NoSuchElementException => System.exit(0)
+      case _: NoSuchElementException => System.exit(0) // input was closed with ^D or EOF
     }
 
     println("Enter an SeriesTitle Regex (empty to match anything) ")
@@ -136,7 +136,6 @@ object InteractiveMode {
     println("Enter an EpisodeTitle Regex (empty to match anything) ")
     val episodeTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
 
-    val filter = new MovieFilter(channel, seriesTitle, episodeTitle)
-    filter
+    new MovieFilter(channel, seriesTitle, episodeTitle)
   }
 }

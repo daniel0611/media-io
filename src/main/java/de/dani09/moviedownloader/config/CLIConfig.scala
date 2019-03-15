@@ -22,46 +22,47 @@ object CLIConfig {
 
       opt[File]('c', "config")
         .valueName("<path>")
-        .text("Path to config file Default: ./config.json")
+        .text("Path to config file default: ./config.json")
         .action((v, c) => c.copy(v.toPath))
         .required()
         .withFallback(() => new File("./config.json"))
 
       opt[Unit]('i', "interactive")
-        .text("Run MovieDownloader in interactive mode to test Regexes of Movie Filters and download single Movies")
+        .text("Run MovieDownloader in interactive mode to test regexes of movie filters and download single movies")
         .action((_, c) => c.copy(interactive = true))
 
       opt[Unit]('f', "fast")
-        .text("Only download the MovieList with the newest Movies")
+        .text("Only download the movie list with the newest movies")
         .action((_, c) => c.copy(diff = true))
 
       opt[String]('r', "remote")
         .valueName("<url>")
-        .text("Execute download actions on a remote Server")
+        .text("Execute download actions on a remote server")
         .action((v, c) => c.copy(remoteServer = v))
 
       note("")
       cmd("serve")
-        .text("Serve the WebFrontend to watch the downloaded Movies in the Browser")
+        .text("Serve the html frontend to watch the downloaded movies in the browser BETA!")
         .action((_, c) => c.copy(serveWebFrontend = true))
         .children(
           opt[Int]('p', "port")
-            .text("Sets the Port that the Server should run on. Default is 80")
+            .text("Sets the port that the server should run on. Default is 80")
             .action((v, c) => c.copy(serverPort = v))
             .validate(v => if ((1 to 65535).contains(v)) success else failure("Port is not valid! must be between 1 and 65535")),
 
           opt[Unit]('r', "remote")
-            .text("Allow remote connection to this server to be able to download Movies remotly")
+            .text("Allow remote connection to this server to be able to download movies remotly ALPHA! USE WITH YOUR OWN RISK." +
+              " Anyone connecting to the server will be able to download any file")
             .action((_, c) => c.copy(remoteServer = "enabled"))
         )
       note("")
 
       checkConfig(c =>
-        if (c.serveWebFrontend && c.interactive) failure("Cannot start interactive Mode and serve the WebFrontend at the same Time!")
+        if (c.serveWebFrontend && c.interactive) failure("Cannot start interactive mode and serve the html frontend at the same time!")
         else success
       )
 
-      version("version").text("Displays the used Version")
+      version("version").text("Displays the used version")
       help("help").text("Displays this help page")
     }
 
@@ -79,6 +80,6 @@ object CLIConfig {
     if (in != null)
       s"Version ${Source.fromInputStream(in).mkString}"
     else
-      "Dev Version"
+      "Dev version"
   }
 }

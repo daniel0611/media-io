@@ -64,7 +64,7 @@ case class Movie(downloadUrl: URL,
 
     if (exists) {
       val size = response.getContentLength / (1024 * 1024)
-      sizeInMb = size.toInt // Updating to more accurate size than the Movie List provides
+      sizeInMb = size.toInt // Updating to more accurate size than the movie list provides
     }
 
     exists

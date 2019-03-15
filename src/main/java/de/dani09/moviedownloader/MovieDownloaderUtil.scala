@@ -26,7 +26,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   def saveMovieData(destination: Path, diff: Boolean, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     val downloadUrl = if (diff) config.movieDataDiffSource else config.movieDataSource
 
-    downloadFile(destination, downloadUrl, "Movie Data")
+    downloadFile(destination, downloadUrl, "Movie list")
   }
 
   def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
@@ -137,9 +137,9 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   }
 
   /**
-    * Parses manually included Movies from config.downloadDirectory/include.json
+    * Parses manually included movies from config.downloadDirectory/include.json
     *
-    * @return the Movies which need to be included.
+    * @return the movies which need to be included.
     *         In case the file doesn't exist or it can't be parsed it will return an empty list instead
     */
   private def getIncludedMovies: List[Movie] = {

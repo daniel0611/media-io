@@ -24,10 +24,10 @@ object Main {
       config = Config.parseConfig(cliConf.configPath)
     } catch {
       case e: JSONException =>
-        println(s"Couldn't parse Config at ${"\"" + cliConf.configPath + "\""}: $e")
+        println(s"Couldn't parse config at ${"\"" + cliConf.configPath + "\""}: $e")
         System.exit(1)
       case e: Throwable =>
-        println(s"Couldn't load Config at ${"\"" + cliConf.configPath + "\""}: $e")
+        println(s"Couldn't load config at ${"\"" + cliConf.configPath + "\""}: $e")
         System.exit(1)
     }
 
@@ -35,7 +35,7 @@ object Main {
       if (config.remote != null && cliConf.remoteServer == null)
         cliConf = cliConf.copy(remoteServer = config.remote)
 
-      println(s"Parsed Config from ${"\"" + cliConf.configPath + "\""} successfully")
+      println(s"Parsed config from ${"\"" + cliConf.configPath + "\""} successfully")
     }
 
     if (cliConf.interactive) {
@@ -44,7 +44,7 @@ object Main {
     }
 
     if (config == null) {
-      println(s"No Config file found at ${cliConf.configPath}")
+      println(s"No config file found at ${cliConf.configPath}")
       System.exit(1)
     }
 
@@ -71,7 +71,7 @@ object Main {
     if (cli.remoteServer == null || cli.remoteServer.isEmpty) // only if not connected to remote
       movies.filter(downloader.isMovieAlreadyDownloaded).foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
 
-    println(s"${movies.length} Movies matched Filters")
+    println(s"${movies.length} movies matched filters")
 
     movies = movies
       .filter(x => !downloader.isMovieAlreadyDownloaded(x))
@@ -83,16 +83,16 @@ object Main {
     System.gc()
 
     if (movies.nonEmpty) {
-      println(s"Will download ${movies.length} Movies:")
+      println(s"Will download ${movies.length} movies:")
       movies.foreach(m => println(s"${m.tvChannel} --> ${m.seriesTitle} --> ${m.episodeTitle}"))
       println()
     } else {
-      println("No new Movies to download!")
+      println("No new movies to download!")
     }
 
     movies.toList
       .foreach(mov => {
-        println(s"[${movies.indexOf(mov) + 1}/${movies.length}] Will download following Movie:")
+        println(s"[${movies.indexOf(mov) + 1}/${movies.length}] Will download following movie:")
         mov.printInfo()
 
         downloader.downloadMovie(mov)
@@ -120,10 +120,10 @@ object Main {
   }
 
   def getMovies(downloader: MovieDownloaderUtil, path: Path = getMovieListTmpPath): ParSeq[Movie] = {
-    println("Reading Movie Data")
+    println("Reading movie data")
     val movies = downloader.getMovieList(path)
-    println("Parsed Movie Data successfully")
-    println(s"${movies.length} Movies found in total")
+    println("Parsed movie data successfully")
+    println(s"${movies.length} movies found in total")
 
     movies
   }

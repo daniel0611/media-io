@@ -12,7 +12,6 @@ class MovieFilter(
                  ) {
 
   def matchesMovie(movie: Movie): Boolean = {
-
     if (tvChannel != "" && tvChannel.toLowerCase() != movie.tvChannel.toLowerCase()) return false
 
     val matchesSeries = seriesTitle.findFirstIn(movie.seriesTitle).nonEmpty
