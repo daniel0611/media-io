@@ -1,6 +1,6 @@
 package de.dani09.moviedownloader
 
-import java.io.PrintStream
+import java.io.{OutputStream, PrintStream}
 import java.nio.file.{Path, Paths}
 
 import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
@@ -133,12 +133,15 @@ object Main {
     */
   def registerFilteredPrintStream(): Unit = {
     val original = System.out
-    val filteredStream = new PrintStream((b: Int) => {
-      val trace = Thread.currentThread().getStackTrace
-      val count = trace.count(_.getClassName.startsWith("de.mediathekview.mlib"))
+    //noinspection ConvertExpressionToSAM Scala 2.11
+    val filteredStream = new PrintStream(new OutputStream() {
+      override def write(b: Int): Unit = {
+        val trace = Thread.currentThread().getStackTrace
+        val count = trace.count(_.getClassName.startsWith("de.mediathekview.mlib"))
 
-      if (count < 1)
-        original.write(b)
+        if (count < 1)
+          original.write(b)
+      }
     })
 
     System.setOut(filteredStream)
