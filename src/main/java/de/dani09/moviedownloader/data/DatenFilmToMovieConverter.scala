@@ -11,52 +11,26 @@ import scala.language.implicitConversions
 class DatenFilmToMovieConverter(mov: DatenFilm) {
   private lazy val releaseDateParser = new SimpleDateFormat("hh:mm:ss dd.MM.yyyy")
 
-  // TODO make more reliable
   def toMovie: Movie = {
-    val arr = proccessArray(mov.arr)
-    if (arr.size < 8) {
-      return null
-    }
-
     try {
-      val releaseDateString = arr(3)
-      val releaseTimeString = arr(4)
+      val releaseDateString = mov.arr(6)
+      val releaseTimeString = mov.arr(7)
 
       val releaseDate = releaseDateParser.parse(s"$releaseTimeString $releaseDateString")
 
       new Movie(
         downloadUrl = new URL(mov.getUrlFuerAufloesung(DatenFilm.AUFLOESUNG_HD)),
-        tvChannel = arr.head,
-        seriesTitle = arr(1),
-        episodeTitle = arr(2),
+        tvChannel = mov.arr(1),
+        seriesTitle = mov.arr(2),
+        episodeTitle = mov.arr(3),
         releaseDate = releaseDate,
-        description = arr(7),
+        description = mov.arr(12),
         lengthInMinutes = mov.dauerL / 60,
         sizeInMb = mov.dateigroesseL.l.toInt
       )
     } catch {
       case _: ParseException => null
       case _: MalformedURLException => null
-    }
-  }
-
-  private def proccessArray(data: Array[String]): List[String] =
-    data
-      .toList
-      .filter(_ != "")
-      .filter(!_.endsWith(".mp4"))
-      .filter(e => !isUrl(e))
-
-  private def isUrl(url: String): Boolean = {
-    if (!url.startsWith("http")) {
-      return false
-    }
-
-    try {
-      new URL(url)
-      true
-    } catch {
-      case _: Throwable => false
     }
   }
 }
