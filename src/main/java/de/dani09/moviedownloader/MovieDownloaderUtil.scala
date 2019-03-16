@@ -24,86 +24,29 @@ import scala.io.Source
 
 class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CLIConfig = new CLIConfig()) {
 
-  def saveMovieData(destination: Path, diff: Boolean, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
+  /**
+    * Downloads the movie list from the url specified in the provided config
+    *
+    * @param destination where the movie data should be stored
+    * @param diff        should a faster diff list be used?
+    */
+  def saveMovieData(destination: Path, diff: Boolean): Unit = {
     val downloadUrl = if (diff) config.movieDataDiffSource else config.movieDataSource
 
     downloadFile(destination, downloadUrl, "Movie list")
   }
 
-  def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
-    if (isRemote) {
-      val rawPath = movie.getRelativeSavePath.toString
-      val rawUrl = movie.downloadUrl.toURI.toString
-      val path = URLEncoder.encode(rawPath, "utf8")
-      val url = URLEncoder.encode(rawUrl, "utf8")
-
-      val response = Http.get(s"http://${cli.remoteServer}/api/isMovieDownloaded?path=$path&url=$url").execute()
-
-      response.getResponseString match {
-        case "true" => true
-        case "false" => false
-        case e: String =>
-          out.println("Could not find out if movie is downloaded on remote: ")
-          out.println(e)
-          false
-      }
-    } else {
-      val file = getMovieSavePath(movie).toFile
-      isFileUpToDate(file, movie.downloadUrl)
-    }
-  }
-
-  //noinspection SpellCheckingInspection
-  def getMovieList(movieDataPath: Path): ParSeq[Movie] = {
-    val l = new FilmlisteLesen()
-    val latch = new CountDownLatch(1)
-
-    l.addAdListener(new ListenerFilmeLaden() {
-      override def fertig(e: ListenerFilmeLadenEvent): Unit = {
-        super.fertig(e)
-        latch.countDown()
-      }
-    })
-
-    val filme = new ListeFilme()
-    l.readFilmListe(movieDataPath.toString, filme, config.maxDaysOld)
-
-    // Waiting until done
-    latch.await()
-
-    // Convert from "DatenFilm" to Movie
-    val movies = filme.asScala
-      .par
-      .map(m => m.toMovie)
-      .filter(_ != null)
-
-    movies ++ getIncludedMovies.par // add manually included Movies
-  }
-
-  def isFileUpToDate(file: File, url: URL): Boolean = {
-    try {
-      val connection = url.openConnection()
-      val fullSize = connection.getContentLengthLong
-
-      file.length() >= fullSize
-    } catch {
-      case _: Throwable => false
-    }
-  }
-
-  private def isRemote: Boolean = cli.remoteServer != null && cli.remoteServer.nonEmpty
-
-  private def getStandardProgressBar: ProgressBarBuilder = {
-    new ProgressBarBuilder()
-      .setStyle(ProgressBarStyle.ASCII)
-      .setUnit("MB", 1048576)
-      .setUpdateIntervalMillis(1000)
-      .showSpeed()
-  }
-
-  private def getProgressBarHttpListener: HttpProgressListener = getStandardProgressBar.toHttpProgressListener
-
-  private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String, progressNameQuoted: Boolean = false, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
+  /**
+    * Downloads a file and reports progress of it
+    *
+    * @param destination        where the file should be stored
+    * @param downloadUrl        from where it should be downloaded
+    * @param nameForProgress    a name that is display for progress
+    * @param progressNameQuoted whether the progress name should be quoted or not
+    * @param listener           the progress listener defaults to a progress bar on the console
+    */
+  private def downloadFile(destination: Path, downloadUrl: URL, nameForProgress: String,
+                           progressNameQuoted: Boolean = false, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     var outStream: FileOutputStream = null
     val taskName = if (progressNameQuoted) "\"" + nameForProgress + "\"" else nameForProgress
 
@@ -131,8 +74,106 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     }
   }
 
-  private def getMovieSavePath(movie: Movie) = {
+  /**
+    * Will check if movie is downloaded either on client or on remote server
+    *
+    * @param movie the movie which should be checked
+    * @return a bool whether the movie is downloaded
+    */
+  def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
+    if (isRemote) {
+      val rawPath = movie.getRelativeSavePath.toString
+      val rawUrl = movie.downloadUrl.toURI.toString
+      val path = URLEncoder.encode(rawPath, "utf8")
+      val url = URLEncoder.encode(rawUrl, "utf8")
+
+      val response = Http.get(s"http://${cli.remoteServer}/api/isMovieDownloaded?path=$path&url=$url").execute()
+
+      response.getResponseString match {
+        case "true" => true
+        case "false" => false
+        case e: String =>
+          out.println("Could not find out if movie is downloaded on remote: ")
+          out.println(e)
+          false
+      }
+    } else {
+      val file = getMovieSavePath(movie).toFile
+      isFileUpToDate(file, movie.downloadUrl)
+    }
+  }
+
+  /**
+    * Checks if the provided file is up to date with the provided url
+    *
+    * @param file the file
+    * @param url  the associated url
+    * @return a bool whether it is up to date or not
+    */
+  def isFileUpToDate(file: File, url: URL): Boolean = {
+    try {
+      val connection = url.openConnection()
+      val fullSize = connection.getContentLengthLong
+
+      file.length() >= fullSize
+    } catch {
+      case _: Throwable => false
+    }
+  }
+
+  /**
+    * Checks if a remote is specified in the cli config
+    */
+  private def isRemote: Boolean = cli.remoteServer != null && cli.remoteServer.nonEmpty
+
+  private def getStandardProgressBar: ProgressBarBuilder = {
+    new ProgressBarBuilder()
+      .setStyle(ProgressBarStyle.ASCII)
+      .setUnit("MB", 1048576)
+      .setUpdateIntervalMillis(1000)
+      .showSpeed()
+  }
+
+  private def getProgressBarHttpListener: HttpProgressListener = getStandardProgressBar.toHttpProgressListener
+
+  /**
+    * Gets the storage path with filename for a specific movie
+    */
+  private def getMovieSavePath(movie: Movie): Path = {
     movie.getSavePath(config.downloadDirectory)
+  }
+
+  /**
+    * Parses movie data and adds manually included movies
+    *
+    * @param movieDataPath where the movie data/list is saved
+    * @return all parsed movies
+    */
+  //noinspection SpellCheckingInspection
+  def getMovieList(movieDataPath: Path): ParSeq[Movie] = {
+    val l = new FilmlisteLesen()
+    val latch = new CountDownLatch(1)
+
+    l.addAdListener(new ListenerFilmeLaden() {
+      override def fertig(e: ListenerFilmeLadenEvent): Unit = {
+        super.fertig(e)
+        latch.countDown()
+      }
+    })
+
+    val filme = new ListeFilme()
+    l.readFilmListe(movieDataPath.toString, filme, config.maxDaysOld)
+
+    // Waiting until done
+    latch.await()
+
+    // Convert from "DatenFilm" to Movie
+    val movies = filme.asScala
+      .par
+      .map(m => m.toMovie)
+      .filter(_ != null)
+
+    movies ++ getIncludedMovies.par // add manually included movies
   }
 
   /**
@@ -167,10 +208,16 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     }
   }
 
+  /**
+    * Downloads movie either on current client or on remote server depended by the config
+    *
+    * @param movie    the movie which should be downloaded. Needed fore url and filename
+    * @param listener the listener for progress. Defaults to a progress bar on the terminal
+    */
   def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     if (isRemote) {
       val pbb = getStandardProgressBar
-        .setInitialMax(movie.sizeInMb * 1048576L)
+        .setInitialMax(movie.sizeInMb * 1048576L) // estimated size may be updated by remote
 
       new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
     } else {
