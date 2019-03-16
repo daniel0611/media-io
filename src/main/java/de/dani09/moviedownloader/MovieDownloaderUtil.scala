@@ -3,6 +3,7 @@ package de.dani09.moviedownloader
 import java.io.{File, FileOutputStream, PrintStream}
 import java.net.{URL, URLEncoder}
 import java.nio.file.{Files, Path}
+import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.{Http, HttpProgressListener}
 import de.dani09.moviedownloader.config.{CLIConfig, Config}
@@ -55,12 +56,12 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   //noinspection SpellCheckingInspection
   def getMovieList(movieDataPath: Path): ParSeq[Movie] = {
     val l = new FilmlisteLesen()
+    val latch = new CountDownLatch(1)
 
-    var done = false
     l.addAdListener(new ListenerFilmeLaden() {
       override def fertig(e: ListenerFilmeLadenEvent): Unit = {
         super.fertig(e)
-        done = true
+        latch.countDown()
       }
     })
 
@@ -68,9 +69,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     l.readFilmListe(movieDataPath.toString, filme, config.maxDaysOld)
 
     // Waiting until done
-    while (!done) {
-      Thread.sleep(100)
-    }
+    latch.await()
 
     // Convert from "DatenFilm" to Movie
     val movies = filme.asScala
