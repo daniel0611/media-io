@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ARGS=""
 	
 for arg in "$@"; do

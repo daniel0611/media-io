@@ -20,7 +20,7 @@ RUN ls project
 RUN sbt update
 
 # compile
-COPY . /build
+COPY Dockerfiles /build
 RUN sbt assembly
 RUN cp /build/target/scala-2.12/Medio.jar /build/app.jar
 
