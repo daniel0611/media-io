@@ -1,15 +1,15 @@
-package de.dani09.moviedownloader.web
+package de.dani09.medio.web
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 import java.nio.ByteBuffer
 import java.util.concurrent.{Executors, ScheduledThreadPoolExecutor, TimeUnit}
 
 import de.dani09.http.HttpProgressListener
-import de.dani09.moviedownloader.MovieDownloaderUtil
-import de.dani09.moviedownloader.config.{Config, DownloadedMovies}
-import de.dani09.moviedownloader.data.Movie
-import de.dani09.moviedownloader.web.DownloadStatus._
-import de.dani09.moviedownloader.web.RemoteConnectionServlet._
+import de.dani09.medio.MovieDownloaderUtil
+import de.dani09.medio.config.{Config, DownloadedMovies}
+import de.dani09.medio.data.Movie
+import de.dani09.medio.web.DownloadStatus._
+import de.dani09.medio.web.RemoteConnectionServlet._
 import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.annotations.{OnWebSocketClose, OnWebSocketConnect, OnWebSocketMessage, WebSocket}
 import org.eclipse.jetty.websocket.servlet.{WebSocketServlet, WebSocketServletFactory}

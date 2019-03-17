@@ -1,11 +1,11 @@
-package de.dani09.moviedownloader.config
+package de.dani09.medio.config
 
 import java.io.File
 import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
-import de.dani09.moviedownloader.data.Movie
+import de.dani09.medio.data.Movie
 import org.json.JSONObject
 
 import scala.collection.JavaConverters._

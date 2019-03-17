@@ -1,6 +1,6 @@
-package de.dani09.moviedownloader.web
+package de.dani09.medio.web
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config}
+import de.dani09.medio.config.{CLIConfig, Config}
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{DefaultServlet, ServletHolder}
 import org.eclipse.jetty.webapp.WebAppContext

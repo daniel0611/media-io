@@ -24,11 +24,11 @@ jobs:
     - DOCKER_USERNAME=dani09
     - secure: "CepK1umW/eNMekHR+XPf0XNX9hpPmRdyOQM47nCPJWz1/AP1+yluv7eWUWJogjotdPEZl3WQB2ycx1pCLPhfjO+lls2UcQkUpsuIZsuaXOa+fk7DBqrLmmhjvM79P6kf6XhDTiXvqjUZlMIHeKhp4sqOVMggRK3lG4bUTcljIz2Bl5QhyhfL/O7AMX/PJXhhlL+655+W/ImLsorgwYWIXvfnecUGCmvFMkwX4h9OBGZGNSMbqf6Biffow2GS+c8mdA4cipq3N+1Q9dD8azkEJOcPK277k0Yx9dd7lNqTtMm8yJnldwjp5MdDk6Ntd3+pFwL83BDnukCKGOQUkV6DVF2SCEl0xdv3eLAS1gHPkFg1HhzIst8zfDFcrVQ0jk1kqpqjLC1jcwcarvlBmfcpowbHkRR5Sl/ILlcVQddsHaBrYMTQhNKBqu6Sia6Ndus7Kcj3H2d+Lb1d1+mVw1qABTuootobIFjeBben47+huFkAE1Ukrt/JkCqQWJOpOIl4vgC4BB774S7OJ5iK5YBZJXQs8K04V1hm5A4It4fBDPFr2S4wG8o8smNW67+wJtToL7IwRVAuhcbc1prMvlL2lh+zoSLeLPlwXjUE/TRi/mLr78gcMowrF+sgL2MiINoxSx8XdkoGPlxNXqcBp6erKg/vQ3qPCs5cPSJ/x4i3760="
     script: |
-      docker build . -f k8s/Dockerfiles/Dockerfile       -t dani09/movie-downloader
-      docker build . -f k8s/Dockerfiles/nginx.Dockerfile -t dani09/movie-downloader:nginx
+      docker build . -f k8s/Dockerfiles/Dockerfile       -t dani09/medio
+      docker build . -f k8s/Dockerfiles/nginx.Dockerfile -t dani09/medio:nginx
     deploy:
       provider: script
-      script: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin && docker push dani09/movie-downloader
+      script: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin && docker push dani09/medio
       on:
         branch: master
 
@@ -40,5 +40,5 @@ deploy:
   file_glob: true
   file: build/libs/*
   on:
-    repo: dani909/movie-downloader
+    repo: dani909/medio
     tags: true

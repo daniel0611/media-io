@@ -1,8 +1,6 @@
 .idea/
-MovieDownloader.iml
-config.json
-config.prod.json
+config*.json
+!config.example.json
 download
-out/
 target
 src/main/resources/version.txt

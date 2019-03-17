@@ -1,13 +1,13 @@
-package de.dani09.moviedownloader.web
+package de.dani09.medio.web
 
 import java.io.{ByteArrayOutputStream, PrintStream}
 import java.net.{URL, URLEncoder}
 import java.nio.file.Paths
 
-import de.dani09.moviedownloader.MovieDownloaderUtil
-import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
-import de.dani09.moviedownloader.data.Movie
-import de.dani09.moviedownloader.web.WebFrontendServlet.LocalDownloadedMovies
+import de.dani09.medio.MovieDownloaderUtil
+import de.dani09.medio.config.{CLIConfig, Config, DownloadedMovies}
+import de.dani09.medio.data.Movie
+import de.dani09.medio.web.WebFrontendServlet.LocalDownloadedMovies
 import org.json.{JSONArray, JSONObject}
 import org.scalatra.ScalatraServlet
 

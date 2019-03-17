@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader
+package de.dani09.medio
 
 import java.io.{File, FileOutputStream, PrintStream}
 import java.net.{URL, URLEncoder}
@@ -6,11 +6,11 @@ import java.nio.file.{Files, Path}
 import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.{Http, HttpProgressListener}
-import de.dani09.moviedownloader.config.{CLIConfig, Config}
-import de.dani09.moviedownloader.data.DatenFilmToMovieConverter._
-import de.dani09.moviedownloader.data.Movie
-import de.dani09.moviedownloader.data.ProgressBarBuilder2HttpProgressListener._
-import de.dani09.moviedownloader.web.RemoteConnectionClient
+import de.dani09.medio.config.{CLIConfig, Config}
+import de.dani09.medio.data.DatenFilmToMovieConverter._
+import de.dani09.medio.data.Movie
+import de.dani09.medio.data.ProgressBarBuilder2HttpProgressListener._
+import de.dani09.medio.web.RemoteConnectionClient
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen

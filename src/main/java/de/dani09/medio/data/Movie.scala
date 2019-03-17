@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader.data
+package de.dani09.medio.data
 
 import java.net.URL
 import java.nio.file.{Path, Paths}

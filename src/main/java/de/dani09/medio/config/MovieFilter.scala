@@ -1,6 +1,6 @@
-package de.dani09.moviedownloader.config
+package de.dani09.medio.config
 
-import de.dani09.moviedownloader.data.Movie
+import de.dani09.medio.data.Movie
 
 import scala.util.matching.Regex
 

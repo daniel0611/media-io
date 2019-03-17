@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader.config
+package de.dani09.medio.config
 
 import java.io.File
 import java.nio.file.Path
@@ -17,8 +17,8 @@ case class CLIConfig(
 object CLIConfig {
   //noinspection SpellCheckingInspection
   def parse(args: Array[String]): CLIConfig = {
-    val parser = new scopt.OptionParser[CLIConfig]("MovieDownloader") {
-      head("MovieDownloader", getVersion)
+    val parser = new scopt.OptionParser[CLIConfig]("Medio") {
+      head("Medio", getVersion)
 
       opt[File]('c', "config")
         .valueName("<path>")
@@ -28,7 +28,7 @@ object CLIConfig {
         .withFallback(() => new File("./config.json"))
 
       opt[Unit]('i', "interactive")
-        .text("Run MovieDownloader in interactive mode to test regexes of movie filters and download single movies")
+        .text("Run in interactive mode to test regexes of movie filters and download single movies")
         .action((_, c) => c.copy(interactive = true))
 
       opt[Unit]('f', "fast")

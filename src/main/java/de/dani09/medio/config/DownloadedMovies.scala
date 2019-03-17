@@ -1,9 +1,9 @@
-package de.dani09.moviedownloader.config
+package de.dani09.medio.config
 
 import java.io.{File, FileWriter}
 import java.nio.file.Paths
 
-import de.dani09.moviedownloader.data.Movie
+import de.dani09.medio.data.Movie
 import org.json.{JSONArray, JSONException}
 
 import scala.collection.mutable.ListBuffer

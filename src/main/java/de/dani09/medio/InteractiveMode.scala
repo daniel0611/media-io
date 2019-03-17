@@ -1,11 +1,11 @@
-package de.dani09.moviedownloader
+package de.dani09.medio
 
 import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies, MovieFilter}
-import de.dani09.moviedownloader.data.Movie
+import de.dani09.medio.config.{CLIConfig, Config, DownloadedMovies, MovieFilter}
+import de.dani09.medio.data.Movie
 
 object InteractiveMode {
   def start(config: Config, cli: CLIConfig): Unit = {

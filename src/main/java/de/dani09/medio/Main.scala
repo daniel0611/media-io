@@ -1,11 +1,11 @@
-package de.dani09.moviedownloader
+package de.dani09.medio
 
 import java.io.{OutputStream, PrintStream}
 import java.nio.file.{Path, Paths}
 
-import de.dani09.moviedownloader.config.{CLIConfig, Config, DownloadedMovies}
-import de.dani09.moviedownloader.data.Movie
-import de.dani09.moviedownloader.web.WebFrontendMode
+import de.dani09.medio.config.{CLIConfig, Config, DownloadedMovies}
+import de.dani09.medio.data.Movie
+import de.dani09.medio.web.WebFrontendMode
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq

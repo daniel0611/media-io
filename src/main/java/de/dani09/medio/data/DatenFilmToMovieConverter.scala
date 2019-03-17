@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader.data
+package de.dani09.medio.data
 
 import java.net.{MalformedURLException, URL}
 import java.text.{ParseException, SimpleDateFormat}

@@ -22,7 +22,7 @@ RUN sbt update
 # compile
 COPY . /build
 RUN sbt assembly
-RUN cp /build/target/scala-2.12/MovieDownloader.jar /build/app.jar
+RUN cp /build/target/scala-2.12/Medio.jar /build/app.jar
 
 
 FROM openjdk:8-jre-alpine

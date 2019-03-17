@@ -1,10 +1,10 @@
-package de.dani09.moviedownloader.web
+package de.dani09.medio.web
 
 import java.net.URI
 import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.HttpProgressListener
-import de.dani09.moviedownloader.data.Movie
+import de.dani09.medio.data.Movie
 import me.tongfei.progressbar.{ProgressBar, ProgressBarBuilder}
 import org.eclipse.jetty.websocket.api.Session
 import org.eclipse.jetty.websocket.api.annotations._

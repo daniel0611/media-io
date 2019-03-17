@@ -1,4 +1,4 @@
-package de.dani09.moviedownloader.data
+package de.dani09.medio.data
 
 import de.dani09.http.HttpProgressListener
 import me.tongfei.progressbar.{ProgressBar, ProgressBarBuilder}

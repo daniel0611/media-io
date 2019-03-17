@@ -1,6 +1,6 @@
 import java.io.FileWriter
 
-name := "movie-downloader"
+name := "medio"
 organization := "de.dani09"
 
 version := "0.1"
@@ -9,7 +9,7 @@ crossScalaVersions := Seq("2.11.12", "2.12.8")
 useJCenter := true
 resolvers += Classpaths.typesafeReleases
 
-assemblyJarName in assembly := "MovieDownloader.jar"
+assemblyJarName in assembly := "Medio.jar"
 
 libraryDependencies ++= Seq(
   "de.mediathekview" % "MLib" % "3.0.2",
