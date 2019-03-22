@@ -8,7 +8,7 @@ import de.dani09.medio.MovieDownloaderUtil
 import de.dani09.medio.config.{CLIConfig, Config, DownloadedMovies}
 import de.dani09.medio.data.Movie
 import de.dani09.medio.web.WebFrontendServlet.LocalDownloadedMovies
-import org.json.{JSONArray, JSONObject}
+import org.json.JSONArray
 import org.scalatra.ScalatraServlet
 
 class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
@@ -20,6 +20,9 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
     contentType = "application/json"
   }
 
+  /**
+    * Sends all downloaded movies as json
+    */
   get("/getMovies") {
     val movies = DownloadedMovies
       .deserialize(conf).withLocalDownloadUrls
@@ -28,34 +31,25 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
     new DownloadedMovies(movies).toJson
   }
 
-  get("/getOverView") {
-    // FIXME document this and make it easier to understand!!!!!!!
-    DownloadedMovies
-      .deserialize(conf).withLocalDownloadUrls
-      .getMovies
-      .groupBy(_.tvChannel)
-      .mapValues(_.groupBy(_.seriesTitle))
-      .mapValues(_.mapValues(_.map(_.toJson)))
-      .mapValues(_.mapValues(_.foldLeft(new JSONArray())((arr, item) => arr.put(item))))
-      .mapValues(_.foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2)))
-      .foldLeft(new JSONObject())((json, item) => json.put(item._1, item._2))
-      .toString
-  }
-
+  /**
+    * Returns all tvChannels in an sorted json array
+    */
   get("/getTvChannels") {
     // TODO comment this
     DownloadedMovies
       .deserialize(conf).withLocalDownloadUrls
       .getMovies
       .map(_.tvChannel)
-      .map(_.toUpperCase)
-      .groupBy(identity)
-      .filter(_._2.nonEmpty)
-      .keys
-      .foldLeft(new JSONArray())((arr, key) => arr.put(key))
+      .map(_.toUpperCase) // get all tvChannels in uppercase
+      .distinct // remove duplicates
+      .sorted
+      .foldLeft(new JSONArray())((arr, key) => arr.put(key)) // put into json array
       .toString
   }
 
+  /**
+    * Returns all series of a specific tvChannel as a sorted json array
+    */
   get("/getSeries") {
     val channel = params.getOrElse("channel", "").toUpperCase()
 
@@ -69,11 +63,15 @@ class WebFrontendServlet(conf: Config, cli: CLIConfig) extends ScalatraServlet {
         .filter(m => channel == m.tvChannel.toUpperCase) // check if channel is the same
         .map(_.seriesTitle)
         .distinct
-        .foldLeft(new JSONArray())((arr, movie) => arr.put(movie))
+        .sorted
+        .foldLeft(new JSONArray())((arr, movie) => arr.put(movie)) // put into json array
         .toString
     }
   }
 
+  /**
+    * Returns all episodes of a specific series sorted by release date
+    */
   get("/getEpisodes") {
     val series = params.getOrElse("series", "").toLowerCase
 
