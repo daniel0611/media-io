@@ -1,4 +1,4 @@
-package de.dani09.medio
+package de.dani09.mediaio
 
 import java.io.{File, FileOutputStream, PrintStream}
 import java.net.{URL, URLEncoder}
@@ -6,11 +6,11 @@ import java.nio.file.{Files, Path}
 import java.util.concurrent.CountDownLatch
 
 import de.dani09.http.{Http, HttpProgressListener}
-import de.dani09.medio.config.{CLIConfig, Config}
-import de.dani09.medio.data.DatenFilmToMovieConverter._
-import de.dani09.medio.data.Movie
-import de.dani09.medio.data.ProgressBarBuilder2HttpProgressListener._
-import de.dani09.medio.web.RemoteConnectionClient
+import de.dani09.mediaio.config.{CLIConfig, Config}
+import de.dani09.mediaio.data.DatenFilmToMovieConverter._
+import de.dani09.mediaio.data.Movie
+import de.dani09.mediaio.data.ProgressBarBuilder2HttpProgressListener._
+import de.dani09.mediaio.web.RemoteConnectionClient
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -191,7 +191,10 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     }
 
     try {
-      val jsonString = Source.fromFile(file).getLines().mkString // get file content as a string
+      val source = Source.fromFile(file)
+      val jsonString = source.getLines().mkString // get file content as a string
+      source.close()
+
       val arr = new JSONArray(jsonString) // parse to JSONArray
 
       val list = (for (i <- 0 until arr.length()) yield i) // get indices

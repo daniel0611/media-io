@@ -1,4 +1,4 @@
-package de.dani09.medio.web
+package de.dani09.mediaio.web
 
 import javax.servlet.ServletContext
 import org.scalatra._

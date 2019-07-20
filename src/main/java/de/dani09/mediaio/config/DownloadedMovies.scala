@@ -1,9 +1,9 @@
-package de.dani09.medio.config
+package de.dani09.mediaio.config
 
 import java.io.{File, FileWriter}
 import java.nio.file.Paths
 
-import de.dani09.medio.data.Movie
+import de.dani09.mediaio.data.Movie
 import org.json.{JSONArray, JSONException}
 
 import scala.collection.mutable.ListBuffer
@@ -71,7 +71,10 @@ object DownloadedMovies {
     if (!file.exists()) new DownloadedMovies()
 
     try {
-      val text = Source.fromFile(file).getLines().mkString("")
+      val source = Source.fromFile(file)
+      val text = source.getLines().mkString("")
+      source.close()
+
       val arr = new JSONArray(text)
 
       val movies = (for (i <- 0 until arr.length()) yield i)

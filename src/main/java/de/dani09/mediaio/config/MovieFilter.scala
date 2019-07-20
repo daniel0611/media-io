@@ -1,6 +1,6 @@
-package de.dani09.medio.config
+package de.dani09.mediaio.config
 
-import de.dani09.medio.data.Movie
+import de.dani09.mediaio.data.Movie
 
 import scala.util.matching.Regex
 

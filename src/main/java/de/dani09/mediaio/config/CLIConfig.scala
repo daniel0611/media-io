@@ -1,4 +1,4 @@
-package de.dani09.medio.config
+package de.dani09.mediaio.config
 
 import java.io.File
 import java.nio.file.Path

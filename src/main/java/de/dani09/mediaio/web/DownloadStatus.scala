@@ -1,4 +1,4 @@
-package de.dani09.medio.web
+package de.dani09.mediaio.web
 
 /**
   * Enum for reporting status when downloading on remote server

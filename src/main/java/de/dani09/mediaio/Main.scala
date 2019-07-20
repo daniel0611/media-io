@@ -1,11 +1,11 @@
-package de.dani09.medio
+package de.dani09.mediaio
 
 import java.io.{OutputStream, PrintStream}
 import java.nio.file.{Path, Paths}
 
-import de.dani09.medio.config.{CLIConfig, Config, DownloadedMovies}
-import de.dani09.medio.data.Movie
-import de.dani09.medio.web.WebFrontendMode
+import de.dani09.mediaio.config.{CLIConfig, Config, DownloadedMovies}
+import de.dani09.mediaio.data.Movie
+import de.dani09.mediaio.web.WebFrontendMode
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
