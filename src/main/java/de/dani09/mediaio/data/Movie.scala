@@ -25,8 +25,8 @@ case class Movie(downloadUrl: URL,
     println(s"${withSpaces("SeriesTitle:")}$seriesTitle")
     println(s"${withSpaces("EpisodeTitle:")}$episodeTitle")
     println(s"${withSpaces("ReleaseDate:")}$releaseDate")
-    println(s"${withSpaces("Length:")}$lengthInMinutes Minutes")
-    println(s"${withSpaces("Size:")}$sizeInMb Mb")
+    println(s"${withSpaces("Length:")}$lengthInMinutes minutes")
+    println(s"${withSpaces("Size:")}$sizeInMb MB")
 
     if (withEmptyLineAtEnd) println()
   }
