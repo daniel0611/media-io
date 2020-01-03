@@ -1,15 +1,12 @@
 import java.io.FileWriter
 
-name := "medio"
+name := "media-io"
 organization := "de.dani09"
 
 version := "0.1"
+scalaVersion := "2.12.10"
 
-crossScalaVersions := Seq("2.11.12", "2.12.8")
-useJCenter := true
-resolvers += Classpaths.typesafeReleases
-
-assemblyJarName in assembly := "Medio.jar"
+assemblyJarName in assembly := "Media-IO.jar"
 
 libraryDependencies ++= Seq(
   "de.mediathekview" % "MLib" % "3.0.2",
