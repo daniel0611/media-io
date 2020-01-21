@@ -1,43 +1,10 @@
 language: scala
 
-scala:
-  - 2.11.12
-  - 2.12.8
-
 before_cache:
 # Cleanup the cached directories to avoid unnecessary cache updates
-- find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
 - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 cache:
   directories:
   - $HOME/.sbt
-    $HOME/.ivy2
-    target
-
-jobs:
-  include:
-  - sudo: required
-    language: bash
-    scala: []
-    env:
-    - DOCKER_USERNAME=dani09
-    - secure: "CepK1umW/eNMekHR+XPf0XNX9hpPmRdyOQM47nCPJWz1/AP1+yluv7eWUWJogjotdPEZl3WQB2ycx1pCLPhfjO+lls2UcQkUpsuIZsuaXOa+fk7DBqrLmmhjvM79P6kf6XhDTiXvqjUZlMIHeKhp4sqOVMggRK3lG4bUTcljIz2Bl5QhyhfL/O7AMX/PJXhhlL+655+W/ImLsorgwYWIXvfnecUGCmvFMkwX4h9OBGZGNSMbqf6Biffow2GS+c8mdA4cipq3N+1Q9dD8azkEJOcPK277k0Yx9dd7lNqTtMm8yJnldwjp5MdDk6Ntd3+pFwL83BDnukCKGOQUkV6DVF2SCEl0xdv3eLAS1gHPkFg1HhzIst8zfDFcrVQ0jk1kqpqjLC1jcwcarvlBmfcpowbHkRR5Sl/ILlcVQddsHaBrYMTQhNKBqu6Sia6Ndus7Kcj3H2d+Lb1d1+mVw1qABTuootobIFjeBben47+huFkAE1Ukrt/JkCqQWJOpOIl4vgC4BB774S7OJ5iK5YBZJXQs8K04V1hm5A4It4fBDPFr2S4wG8o8smNW67+wJtToL7IwRVAuhcbc1prMvlL2lh+zoSLeLPlwXjUE/TRi/mLr78gcMowrF+sgL2MiINoxSx8XdkoGPlxNXqcBp6erKg/vQ3qPCs5cPSJ/x4i3760="
-    script: |
-      docker build . -f Dockerfile -t dani09/medio
-    deploy:
-      provider: script
-      script: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin && docker push dani09/medio
-      on:
-        branch: master
-
-deploy:
-  provider: releases
-  api_key:
-    secure: gQhidLU7K0+BZ7cWnvpyP415gL30Etca6k8d9q4NYRfnSVqddEzjtjyBtSEtXElGWM6jzWxjuKwyWBYZoaDdFhZD/WdpHTPcI1VPvR5XJiODwsap3O7p+PkCXXZPp8tOdL2wdfst7RnRmf29VZ0hSfAtmNipbsQnP2Rmrid0oNpymwDHtc77o4pTXkrSj90jHO99EWCCPnj5A99DzmzP0SIDK4Z7ncXC8lnS5eh+wzKY4kt0Kv+MAmWm28qRD8i0S7iUsd4mJUfptOY9X+dJLqN+GSbW6sldCjwtj/dAhRpH0eJcdtti7cQb3zGE3X6DoiCGb1At+kBE8UnjSWGenqK1le429UrOUGymZG5OjtMlpNxqKiOYHnEo4W/30vU1cYg1ByXGGdyFKgNpe+NcbE94ZatNGMKxswuTf6lF06XUWlCS4MPks9MizA9BrqTQZAUS0fjHlLiex1umYWYoIadGVye5lVYOcgzGYtNi/fERQopHcHV2L858P+V16GBJ0S7RgAGttS8tZ3yttwKDnFE0H7VAE8S2IdI8F7VLv3IjRYJvCB6v9z89Dn8kFIUtiPdpWXO1lrdKXvS/c9sp7OeWRoG+VFUav1TneVv/h/TCVPsT/XBiquKXQ/r+nB14DekZHPse3b+PavbU9+eQlEv8tNBHdp8hUQ10R8Rng+c=
-  skip_cleanup: true
-  file_glob: true
-  file: build/libs/*
-  on:
-    repo: dani909/medio
-    tags: true
+    $HOME/.cache/coursier
