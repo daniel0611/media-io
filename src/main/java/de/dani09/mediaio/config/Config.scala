@@ -5,7 +5,7 @@ import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
 
-import de.dani09.mediaio.data.Movie
+import de.dani09.mediaio.data.{Movie, MovieGrouping}
 import org.json.JSONObject
 
 import scala.collection.JavaConverters._
@@ -71,7 +71,8 @@ object Config {
   private def parseMovieFilter(j: JSONObject): MovieFilter = new MovieFilter(
     tvChannel = j.optString("tvChannel", ""),
     seriesTitle = j.optString("seriesTitle", ".+").r,
-    episodeTitle = j.optString("episodeTitle", ".+").r
+    episodeTitle = j.optString("episodeTitle", ".+").r,
+    groupBy = MovieGrouping.parse(j.optString("groupBy", ""))
   )
 
   def getMovieDataSourceDefaultValue = "https://verteiler1.mediathekview.de/Filmliste-akt.xz"

@@ -5,7 +5,7 @@ import java.nio.file.{Path, Paths}
 import java.util.Scanner
 
 import de.dani09.mediaio.config.{CLIConfig, Config, DownloadedMovies, MovieFilter}
-import de.dani09.mediaio.data.Movie
+import de.dani09.mediaio.data.{Movie, MovieGrouping}
 
 object InteractiveMode {
   def start(config: Config, cli: CLIConfig): Unit = {
@@ -136,6 +136,6 @@ object InteractiveMode {
     println("Enter an EpisodeTitle Regex (empty to match anything) ")
     val episodeTitle = Option(s.nextLine()).filterNot(_.isEmpty).getOrElse(".+").r
 
-    new MovieFilter(channel, seriesTitle, episodeTitle)
+    new MovieFilter(channel, seriesTitle, episodeTitle, MovieGrouping.NONE) // TODO read from config/ask
   }
 }

@@ -14,7 +14,8 @@ case class Movie(downloadUrl: URL,
                  releaseDate: Date,
                  description: String,
                  lengthInMinutes: Long,
-                 var sizeInMb: Int
+                 var sizeInMb: Int,
+                 var groupBy: MovieGrouping.Value = MovieGrouping.NONE
                 ) {
 
   def printInfo(withEmptyLineAtEnd: Boolean = true): Unit = {
@@ -27,6 +28,7 @@ case class Movie(downloadUrl: URL,
     println(s"${withSpaces("ReleaseDate:")}$releaseDate")
     println(s"${withSpaces("Length:")}$lengthInMinutes minutes")
     println(s"${withSpaces("Size:")}$sizeInMb MB")
+    println(s"${withSpaces("GroupBy:")}${groupBy.toString.toLowerCase}")
 
     if (withEmptyLineAtEnd) println()
   }
@@ -45,7 +47,14 @@ case class Movie(downloadUrl: URL,
     val title = seriesTitle.replaceAll("/", "_").replaceAll(":", ".")
     val episode = episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
 
-    Paths.get(s"$tvChannel/$title/$episode-$dateString.$fileExtension")
+    val year = calendar.get(Calendar.YEAR)
+
+    val relPath = groupBy match {
+      case MovieGrouping.YEAR => s"$tvChannel/$title/$year/$episode-$dateString.$fileExtension"
+      case _ => s"$tvChannel/$title/$episode-$dateString.$fileExtension"
+    }
+
+    Paths.get(relPath)
   }
 
   private def getFileExtension(url: URL): String = url.getPath
@@ -79,6 +88,7 @@ case class Movie(downloadUrl: URL,
     .put("description", description)
     .put("length", lengthInMinutes)
     .put("size", sizeInMb)
+    .put("groupBy", groupBy.toString)
 }
 
 object Movie {
@@ -90,6 +100,7 @@ object Movie {
     releaseDate = new Date(j.getLong("releaseDate")),
     description = j.getString("description"),
     lengthInMinutes = j.getLong("length"),
-    sizeInMb = j.getInt("size")
+    sizeInMb = j.getInt("size"),
+    groupBy = MovieGrouping.parse(j.optString("groupBy", ""))
   )
 }
