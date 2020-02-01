@@ -126,15 +126,25 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     */
   private def isRemote: Boolean = cli.remoteServer != null && cli.remoteServer.nonEmpty
 
-  private def getStandardProgressBar: ProgressBarBuilder = {
-    new ProgressBarBuilder()
-      .setStyle(ProgressBarStyle.ASCII)
-      .setUnit("MB", 1048576)
-      .setUpdateIntervalMillis(1000)
-      .showSpeed()
-  }
+  /**
+    * Downloads movie either on current client or on remote server depended by the config
+    *
+    * @param movie    the movie which should be downloaded. Needed fore url and filename
+    * @param listener the listener for progress. Defaults to a progress bar on the terminal
+    */
+  def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
+    if (isRemote) {
+      val pbb = MovieDownloaderUtil.getStandardProgressBar
+        .setInitialMax(movie.sizeInMb * 1048576L) // estimated size may have been updated by remote
 
-  private def getProgressBarHttpListener: HttpProgressListener = getStandardProgressBar.toHttpProgressListener
+      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
+    } else {
+      val destinationPath = getMovieSavePath(movie)
+      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
+
+      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
+    }
+  }
 
   /**
     * Gets the storage path with filename for a specific movie
@@ -211,23 +221,13 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     }
   }
 
-  /**
-    * Downloads movie either on current client or on remote server depended by the config
-    *
-    * @param movie    the movie which should be downloaded. Needed fore url and filename
-    * @param listener the listener for progress. Defaults to a progress bar on the terminal
-    */
-  def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
-    if (isRemote) {
-      val pbb = getStandardProgressBar
-        .setInitialMax(movie.sizeInMb * 1048576L) // estimated size may have been updated by remote
+  private def getProgressBarHttpListener: HttpProgressListener = MovieDownloaderUtil.getStandardProgressBar.toHttpProgressListener
+}
 
-      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
-    } else {
-      val destinationPath = getMovieSavePath(movie)
-      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
-
-      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
-    }
-  }
+object MovieDownloaderUtil {
+  def getStandardProgressBar: ProgressBarBuilder = new ProgressBarBuilder()
+    .setStyle(ProgressBarStyle.ASCII)
+    .setUnit("MB", 1048576)
+    .setUpdateIntervalMillis(1000)
+    .showSpeed()
 }

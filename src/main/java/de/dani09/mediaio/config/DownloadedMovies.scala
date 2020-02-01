@@ -51,6 +51,13 @@ class DownloadedMovies(private val movies: ListBuffer[Movie]) {
   def addMovie(m: Movie): Unit = movies += m
 
   /**
+    * Removes the movie from the list
+    *
+    * @param m the movie you want to remove
+    */
+  def removeMovie(m: Movie): Unit = movies -= m
+
+  /**
     * Get all movies as an Scala ListBuffer
     *
     * @return all movies

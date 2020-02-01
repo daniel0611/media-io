@@ -4,13 +4,11 @@ import java.io.{OutputStream, PrintStream}
 import java.nio.file.{Path, Paths}
 
 import de.dani09.mediaio.config.{CLIConfig, Config, DownloadedMovies}
-import de.dani09.mediaio.data.Movie
+import de.dani09.mediaio.data.{Movie, MovieGroupTransformer}
 import de.dani09.mediaio.web.WebFrontendMode
 import org.json.JSONException
 
 import scala.collection.parallel.ParSeq
-
-// TODO add readme with explanations
 
 object Main {
   val movieListFileName = "movie-data.xz"
@@ -36,6 +34,9 @@ object Main {
         cliConf = cliConf.copy(remoteServer = config.remote)
 
       println(s"Parsed config from ${"\"" + cliConf.configPath + "\""} successfully")
+
+      if (config.remote == null)
+        new MovieGroupTransformer(config).migrateAll()
     }
 
     if (cliConf.interactive) {
