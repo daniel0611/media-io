@@ -1,12 +1,13 @@
 package de.dani09.mediaio.data
 
 object MovieGrouping extends Enumeration {
-  // TODO comment everything
-  val NONE, YEAR = Value
+  val NONE, YEAR, HALF_YEAR = Value
 
   def parse(s: String): Value = {
+    val enumName = s.toUpperCase.replaceAll("-", "_")
+
     values
-      .find(x => x.toString equalsIgnoreCase s)
+      .find(x => x.toString == enumName)
       .getOrElse(NONE)
   }
 }

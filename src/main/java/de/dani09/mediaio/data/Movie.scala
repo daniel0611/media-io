@@ -48,9 +48,18 @@ case class Movie(downloadUrl: URL,
     val episode = episodeTitle.replaceAll("/", "_").replaceAll(":", ".")
 
     val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) + 1
 
     val relPath = groupBy match {
-      case MovieGrouping.YEAR => s"$tvChannel/$title/$year/$episode-$dateString.$fileExtension"
+      case MovieGrouping.YEAR =>
+        s"$tvChannel/$title/$year/$episode-$dateString.$fileExtension"
+      case MovieGrouping.HALF_YEAR =>
+        val yearStr = if (month < 6)
+          s"${year - 1},$year"
+        else
+          s"$year,${year + 1}"
+
+        s"$tvChannel/$title/$yearStr/$episode-$dateString.$fileExtension"
       case _ => s"$tvChannel/$title/$episode-$dateString.$fileExtension"
     }
 
