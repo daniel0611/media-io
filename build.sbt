@@ -9,7 +9,7 @@ scalaVersion := "2.12.10"
 assemblyJarName in assembly := "Media-IO.jar"
 
 libraryDependencies ++= Seq(
-  "de.mediathekview" % "MLib" % "3.0.2",
+  "de.mediathekview" % "MLib" % "3.0.4",
   "org.json" % "json" % "20180813",
   "de.dani09" % "dani-http" % "0.4.2",
   "me.tongfei" % "progressbar" % "0.7.3",
