@@ -88,13 +88,14 @@ object DownloadedMovies {
         .par
         .map(index => arr.getJSONObject(index)) // get JSONObjects by index
         .map(json => { // Parse Movies with JSONObjects
-        try {
-          Movie.fromJson(json)
-        } catch {
-          case _: JSONException => null // will be removed by filter afterwards
-        }
-      }) // ParSeq[JSONObject] -> ParSeq[Movie]
+          try {
+            Movie.fromJson(json)
+          } catch {
+            case _: JSONException => null // will be removed by filter afterwards
+          }
+        }) // ParSeq[JSONObject] -> ParSeq[Movie]
         .filter(_ != null) // filter those out which did threw an JSONException
+        .filter(m => m.getSavePath(config.downloadDirectory).toFile.exists())
         .toList // ParSeq[Movies] -> List[Movies]
 
       new DownloadedMovies(movies)

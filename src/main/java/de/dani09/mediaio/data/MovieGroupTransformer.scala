@@ -1,6 +1,6 @@
 package de.dani09.mediaio.data
 
-import java.nio.file.{Files, StandardCopyOption}
+import java.nio.file.{Files, NoSuchFileException, StandardCopyOption}
 
 import de.dani09.mediaio.config.{Config, DownloadedMovies, MovieFilter}
 
@@ -8,15 +8,15 @@ class MovieGroupTransformer(config: Config) {
   private lazy val dl = DownloadedMovies.deserialize(config)
 
   def migrateAll(): Unit = {
-    val x = dl.getMovies
+    // only where grouping is different
+    dl.getMovies
       .zip(dl.getMovies.map(getMovieFilter))
-
-    val y = x.filter(_._2.isDefined)
-      .filter(m => m._1.groupBy != m._2.get.groupBy) // only where grouping is different
-    y.foreach(x => migrate(x._1, x._2.get))
+      .filter(_._2.isDefined)
+      .filter(m => m._1.groupBy != m._2.get.groupBy)
+      .foreach(x => migrate(x._1, x._2.get))
   }
 
-  private def migrate(m: Movie, filter: MovieFilter): Unit = {
+  private def migrate(m: Movie, filter: MovieFilter): Unit = try {
     val oldPath = m.getSavePath(config.downloadDirectory)
     val newMovie = m.copy(groupBy = filter.groupBy)
     val newPath = newMovie.getSavePath(config.downloadDirectory)
@@ -30,6 +30,11 @@ class MovieGroupTransformer(config: Config) {
     dl.removeMovie(m)
     dl.addMovie(newMovie)
     dl.serialize(config)
+  } catch {
+    case _: NoSuchFileException =>
+    case e: Throwable =>
+      println(s"Couldn't migrate this movie's grouping from ${m.groupBy.toString.toLowerCase} to ${filter.groupBy.toString.toLowerCase}!")
+      e.printStackTrace()
   }
 
   private def getMovieFilter(m: Movie): Option[MovieFilter] = {
