@@ -4,3 +4,4 @@ config*.json
 download
 target
 src/main/resources/version.txt
+.bsp

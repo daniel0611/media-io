@@ -9,15 +9,15 @@ scalaVersion := "2.12.10"
 assemblyJarName in assembly := "Media-IO.jar"
 
 libraryDependencies ++= Seq(
-  "de.mediathekview" % "MLib" % "3.0.4",
-  "org.json" % "json" % "20180813",
+  "de.mediathekview" % "MLib" % "3.0.7",
+  "org.json" % "json" % "20210307",
   "de.dani09" % "dani-http" % "0.4.2",
-  "me.tongfei" % "progressbar" % "0.7.3",
-  "com.github.scopt" %% "scopt" % "3.7.1",
+  "me.tongfei" % "progressbar" % "0.9.0",
+  "com.github.scopt" %% "scopt" % "4.0.1",
 
   // scalatra
-  "org.json4s" %% "json4s-jackson" % "3.6.5",
-  "org.scalatra" %% "scalatra" % "2.6.5",
+  "org.json4s" %% "json4s-jackson" % "3.6.11",
+  "org.scalatra" %% "scalatra" % "2.7.1",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
   "org.eclipse.jetty" % "jetty-webapp" % "9.4.15.v20190215",
   "org.eclipse.jetty.websocket" % "websocket-server" % "9.4.15.v20190215",
