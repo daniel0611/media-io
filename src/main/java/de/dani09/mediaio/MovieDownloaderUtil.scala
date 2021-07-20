@@ -1,10 +1,5 @@
 package de.dani09.mediaio
 
-import java.io.{File, FileOutputStream, PrintStream}
-import java.net.{URL, URLEncoder}
-import java.nio.file.{Files, Path}
-import java.util.concurrent.CountDownLatch
-
 import de.dani09.http.{Http, HttpProgressListener}
 import de.dani09.mediaio.config.{CLIConfig, Config}
 import de.dani09.mediaio.data.DatenFilmToMovieConverter._
@@ -17,9 +12,14 @@ import de.mediathekview.mlib.filmlisten.FilmlisteLesen
 import me.tongfei.progressbar.{ProgressBarBuilder, ProgressBarStyle}
 import org.json.{JSONArray, JSONException}
 
-import scala.collection.JavaConverters._
+import java.io.{File, FileOutputStream, PrintStream}
+import java.net.{URL, URLEncoder}
+import java.nio.file.{Files, Path}
+import java.util.concurrent.CountDownLatch
+import scala.collection.parallel.CollectionConverters._
 import scala.collection.parallel.ParSeq
 import scala.io.Source
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 
 class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CLIConfig = new CLIConfig()) {
@@ -183,7 +183,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
       .map(m => m.toMovie)
       .filter(_ != null)
 
-    movies ++ getIncludedMovies.par // add manually included movies
+    (movies ++ getIncludedMovies.par).toSeq // add manually included movies
   }
 
   /**

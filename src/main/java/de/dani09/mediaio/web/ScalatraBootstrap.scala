@@ -1,15 +1,15 @@
 package de.dani09.mediaio.web
 
-import javax.servlet.ServletContext
 import org.scalatra._
 
+import javax.servlet.ServletContext
 import scala.collection.mutable.ListBuffer
 
 /**
   * ScalatraBootstrap mounts Servlets for Scalatra
   */
 class ScalatraBootstrap extends LifeCycle {
-  override def init(context: ServletContext) {
+  override def init(context: ServletContext): Unit = {
     for ((servlet, url) <- ScalatraBootstrap.servlets) {
       context.mount(servlet, url)
     }

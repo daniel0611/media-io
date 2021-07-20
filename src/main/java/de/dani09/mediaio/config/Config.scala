@@ -1,14 +1,13 @@
 package de.dani09.mediaio.config
 
+import de.dani09.mediaio.data.{Movie, MovieGrouping}
+import org.json.JSONObject
+
 import java.io.File
 import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import java.util.Date
-
-import de.dani09.mediaio.data.{Movie, MovieGrouping}
-import org.json.JSONObject
-
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class Config(
               val downloadDirectory: Path,

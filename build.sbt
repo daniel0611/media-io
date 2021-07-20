@@ -4,7 +4,7 @@ name := "media-io"
 organization := "de.dani09"
 
 version := "0.1"
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.6"
 
 assemblyJarName in assembly := "Media-IO.jar"
 
@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "de.dani09" % "dani-http" % "0.4.2",
   "me.tongfei" % "progressbar" % "0.9.0",
   "com.github.scopt" %% "scopt" % "4.0.1",
+  "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3",
 
   // scalatra
   "org.json4s" %% "json4s-jackson" % "3.6.11",

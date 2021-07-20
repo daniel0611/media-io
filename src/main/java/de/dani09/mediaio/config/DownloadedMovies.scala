@@ -1,17 +1,17 @@
 package de.dani09.mediaio.config
 
-import java.io.{File, FileWriter}
-import java.nio.file.Paths
-
 import de.dani09.mediaio.data.Movie
 import org.json.{JSONArray, JSONException}
 
+import java.io.{File, FileWriter}
+import java.nio.file.Paths
 import scala.collection.mutable.ListBuffer
+import scala.collection.parallel.CollectionConverters._
 import scala.io.Source
 
 class DownloadedMovies(private val movies: ListBuffer[Movie]) {
 
-  def this(movies: List[Movie]) = this(movies.to[ListBuffer]) // converts List to ListBuffer in order to use an List as an argument
+  def this(movies: List[Movie]) = this(movies.to(ListBuffer)) // converts List to ListBuffer in order to use an List as an argument
 
   def this() = this(ListBuffer[Movie]()) // empty constructor
 
