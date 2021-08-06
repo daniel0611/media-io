@@ -14,7 +14,7 @@ case class Movie(downloadUrl: URL,
                  releaseDate: Date,
                  description: String,
                  lengthInMinutes: Long,
-                 var sizeInMb: Int,
+                 var sizeInMB: Int,
                  var groupBy: MovieGrouping.Value = MovieGrouping.NONE
                 ) {
 
@@ -27,7 +27,7 @@ case class Movie(downloadUrl: URL,
     println(s"${withSpaces("EpisodeTitle:")}$episodeTitle")
     println(s"${withSpaces("ReleaseDate:")}$releaseDate")
     println(s"${withSpaces("Length:")}$lengthInMinutes minutes")
-    println(s"${withSpaces("Size:")}$sizeInMb MB")
+    println(s"${withSpaces("Size:")}$sizeInMB MB")
     println(s"${withSpaces("GroupBy:")}${groupBy.toString.toLowerCase}")
 
     if (withEmptyLineAtEnd) println()
@@ -81,8 +81,8 @@ case class Movie(downloadUrl: URL,
     val exists = (200 to 299).contains(response.getResponseCode)
 
     if (exists) {
-      val size = response.getContentLength / (1024 * 1024)
-      sizeInMb = size.toInt // Updating to more accurate size than the movie list provides
+      val size = response.getContentLength / (1000 * 1000)
+      sizeInMB = size.toInt // Updating to more accurate size than the movie list provides
     }
 
     exists
@@ -96,7 +96,7 @@ case class Movie(downloadUrl: URL,
     .put("releaseDate", releaseDate.getTime)
     .put("description", description)
     .put("length", lengthInMinutes)
-    .put("size", sizeInMb)
+    .put("size", sizeInMB)
     .put("groupBy", groupBy.toString)
 }
 
@@ -109,7 +109,7 @@ object Movie {
     releaseDate = new Date(j.getLong("releaseDate")),
     description = j.getString("description"),
     lengthInMinutes = j.getLong("length"),
-    sizeInMb = j.getInt("size"),
+    sizeInMB = j.getInt("size"),
     groupBy = MovieGrouping.parse(j.optString("groupBy", ""))
   )
 }

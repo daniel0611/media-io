@@ -31,7 +31,7 @@ class DatenFilmToMovieConverter(mov: DatenFilm) {
         releaseDate = releaseDate,
         description = mov.arr(12),
         lengthInMinutes = mov.dauerL / 60,
-        sizeInMb = mov.dateigroesseL.l.toInt
+        sizeInMB = mov.dateigroesseL.l.toInt
       )
     } catch {
       case _: ParseException => null

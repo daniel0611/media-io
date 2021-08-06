@@ -171,7 +171,7 @@ object RemoteConnectionServlet {
           if (timesProgressCalled % 100 == 0)
             broadcastJobStatus(job, done, max)
           if (timesProgressCalled % 2000 == 0)
-            logger.info(s"Download job with hash $jobHash has ${done / 1048576}MB of ${max / 1048576}MB downloaded")
+            logger.info(s"Download job with hash $jobHash has ${done / 1000 * 1000}MB of ${max / 1000 * 1000}MB downloaded")
         }
 
         override def onFinish(): Unit = {

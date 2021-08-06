@@ -5,3 +5,8 @@ download
 target
 src/main/resources/version.txt
 .bsp
+.vscode
+.metals
+.bloop
+project/metals.sbt
+project/project

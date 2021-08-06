@@ -135,7 +135,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
     if (isRemote) {
       val pbb = MovieDownloaderUtil.getStandardProgressBar
-        .setInitialMax(movie.sizeInMb * 1048576L) // estimated size may have been updated by remote
+        .setInitialMax(movie.sizeInMB * 1000 * 1000) // estimated size may have been updated by remote
 
       new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
     } else {
@@ -227,7 +227,7 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
 object MovieDownloaderUtil {
   def getStandardProgressBar: ProgressBarBuilder = new ProgressBarBuilder()
     .setStyle(ProgressBarStyle.ASCII)
-    .setUnit("MB", 1048576)
+    .setUnit("MB", 1000 * 1000)
     .setUpdateIntervalMillis(1000)
     .showSpeed()
 }
