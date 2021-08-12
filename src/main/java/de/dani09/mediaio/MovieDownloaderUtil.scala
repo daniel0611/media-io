@@ -5,7 +5,6 @@ import de.dani09.mediaio.config.{CLIConfig, Config}
 import de.dani09.mediaio.data.DatenFilmToMovieConverter._
 import de.dani09.mediaio.data.Movie
 import de.dani09.mediaio.data.ProgressBarBuilder2HttpProgressListener._
-import de.dani09.mediaio.web.RemoteConnectionClient
 import de.mediathekview.mlib.daten.ListeFilme
 import de.mediathekview.mlib.filmesuchen.{ListenerFilmeLaden, ListenerFilmeLadenEvent}
 import de.mediathekview.mlib.filmlisten.FilmlisteLesen
@@ -81,26 +80,8 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
     * @return a bool whether the movie is downloaded
     */
   def isMovieAlreadyDownloaded(movie: Movie): Boolean = {
-    if (isRemote) {
-      val rawPath = movie.getRelativeSavePath.toString
-      val rawUrl = movie.downloadUrl.toURI.toString
-      val path = URLEncoder.encode(rawPath, "utf8")
-      val url = URLEncoder.encode(rawUrl, "utf8")
-
-      val response = Http.get(s"http://${cli.remoteServer}/api/isMovieDownloaded?path=$path&url=$url").execute()
-
-      response.getResponseString match {
-        case "true" => true
-        case "false" => false
-        case e: String =>
-          out.println("Could not find out if movie is downloaded on remote: ")
-          out.println(e)
-          false
-      }
-    } else {
-      val file = getMovieSavePath(movie).toFile
-      isFileUpToDate(file, movie.downloadUrl)
-    }
+    val file = getMovieSavePath(movie).toFile
+    isFileUpToDate(file, movie.downloadUrl)
   }
 
   /**
@@ -122,28 +103,16 @@ class MovieDownloaderUtil(config: Config, out: PrintStream = System.out, cli: CL
   }
 
   /**
-    * Checks if a remote is specified in the cli config
-    */
-  private def isRemote: Boolean = cli.remoteServer != null && cli.remoteServer.nonEmpty
-
-  /**
     * Downloads movie either on current client or on remote server depended by the config
     *
     * @param movie    the movie which should be downloaded. Needed fore url and filename
     * @param listener the listener for progress. Defaults to a progress bar on the terminal
     */
   def downloadMovie(movie: Movie, listener: HttpProgressListener = getProgressBarHttpListener): Unit = {
-    if (isRemote) {
-      val pbb = MovieDownloaderUtil.getStandardProgressBar
-        .setInitialMax(movie.sizeInMB * 1000 * 1000) // estimated size may have been updated by remote
+    val destinationPath = getMovieSavePath(movie)
+    val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
 
-      new RemoteConnectionClient(movie, listener, cli.remoteServer, pbb).downloadMovieOnRemote()
-    } else {
-      val destinationPath = getMovieSavePath(movie)
-      val name = s"${movie.seriesTitle} - ${movie.episodeTitle}"
-
-      downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
-    }
+    downloadFile(destinationPath, movie.downloadUrl, name, progressNameQuoted = true, listener)
   }
 
   /**

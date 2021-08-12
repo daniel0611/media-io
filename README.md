@@ -52,10 +52,6 @@ This mode is designed to download single and irregularity video files like movie
 
  You start it by adding the `-i` or `--interactive` flag.
 
-### Server mode (UNFINISHED, not being worked on!)
-
-By using the `serve` command you can start a local webserver and watch your downloaded videos using a browser. It is theoretically working but the ui is very simple and ugly. Just watching the files with the video player of your choice is a way better experience!!!
-
 ## Manually include videos using `include.json`
 
 If you want to manually include a video into the system because it didn't show up or is from a different platform you can do it with a `include.json`.
@@ -70,7 +66,7 @@ Create a file called `include.json` in your download directory. The content of t
     "seriesTitle": "Hannes und der Bürgermeister",
     "episodeTitle": "\"Kindsköpfe\" / \"Das Gummiboot\"",
     "releaseDate": 1540324800000,
-    "description": "Im Hinblick auf kommende Wahlen soll der Bürgermeister beim Kindergartenfest einen guten Eindruck machen, so die Order seiner Frau.",
+    "description": "",
     "length": 30,
     "size": 421
   }

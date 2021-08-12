@@ -2,7 +2,6 @@ package de.dani09.mediaio
 
 import de.dani09.mediaio.config.{CLIConfig, Config, DownloadedMovies}
 import de.dani09.mediaio.data.{Movie, MovieGroupTransformer}
-import de.dani09.mediaio.web.WebFrontendMode
 import org.json.JSONException
 
 import java.io.{OutputStream, PrintStream}
@@ -30,13 +29,8 @@ object Main {
     }
 
     if (config != null) {
-      if (config.remote != null && cliConf.remoteServer == null)
-        cliConf = cliConf.copy(remoteServer = config.remote)
-
       println(s"Parsed config from ${"\"" + cliConf.configPath + "\""} successfully")
-
-      if (config.remote == null)
-        new MovieGroupTransformer(config).migrateAll()
+      new MovieGroupTransformer(config).migrateAll()
     }
 
     if (cliConf.interactive) {
@@ -47,11 +41,6 @@ object Main {
     if (config == null) {
       println(s"No config file found at ${cliConf.configPath}")
       System.exit(1)
-    }
-
-    if (cliConf.serveWebFrontend) {
-      WebFrontendMode.start(config, cliConf.copy(remoteServer = ""))
-      System.exit(0)
     }
 
     downloadMovies(config, cliConf)
@@ -69,8 +58,7 @@ object Main {
       .filter(x => config.matchesMovie(x))
       .filter(_.exists())
 
-    if (cli.remoteServer == null || cli.remoteServer.isEmpty) // only if not connected to remote
-      movies.filter(downloader.isMovieAlreadyDownloaded).foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
+    movies.filter(downloader.isMovieAlreadyDownloaded).foreach(downloadedMovies.addMovie) // if they aren't in the list they will be added here
 
     println(s"${movies.length} movies matched filters")
 
@@ -99,10 +87,8 @@ object Main {
         downloader.downloadMovie(mov)
         println()
 
-        if (cli.remoteServer == null || cli.remoteServer.isEmpty) {
-          downloadedMovies.addMovie(mov)
-          downloadedMovies.serialize(config)
-        }
+        downloadedMovies.addMovie(mov)
+        downloadedMovies.serialize(config)
       })
 
     println("Done!")
