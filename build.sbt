@@ -37,7 +37,7 @@ run := ((Compile / run) dependsOn createVersionFile).evaluated
 // Run sbt docker:stage and then a Dockerfile will be in target/docker/stage/Dockerfile
 
 enablePlugins(JavaAppPackaging)
-dockerBaseImage := "adoptopenjdk:11-jre"
+dockerBaseImage := "eclipse-temurin:17-jre"
 Docker / defaultLinuxInstallLocation := "/app"
 Docker / daemonUser := "root"
 Docker / daemonUserUid := None
