@@ -36,6 +36,7 @@ class DatenFilmToMovieConverter(mov: DatenFilm) {
     } catch {
       case _: ParseException => null
       case _: MalformedURLException => null
+      case _: StringIndexOutOfBoundsException => null
     }
   }
 }
