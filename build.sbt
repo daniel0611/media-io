@@ -4,14 +4,14 @@ name := "media-io"
 organization := "de.dani09"
 
 version := "0.1"
-scalaVersion := "3.0.2"
+scalaVersion := "3.3.1"
 
 libraryDependencies ++= Seq(
-  "de.mediathekview" % "MLib" % "3.0.12",
-  "org.json" % "json" % "20211205",
+  "de.mediathekview" % "MLib" % "3.0.13",
+  "org.json" % "json" % "20231013",
   "de.dani09" % "dani-http" % "0.4.2",
-  "me.tongfei" % "progressbar" % "0.9.3",
-  "com.github.scopt" %% "scopt" % "4.0.1",
+  "me.tongfei" % "progressbar" % "0.10.0",
+  "com.github.scopt" %% "scopt" % "4.1.0",
   "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
 )
 

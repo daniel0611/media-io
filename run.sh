@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
+
+export SBT_OPTS="-Xmx2G"
 
 ARGS=""
 
